@@ -11,33 +11,29 @@ const insertDummyData = require('./SampleData/dummyData');
 const server = express();
 const port = 3000;
 const userAppRouter = require('./routes/userApp');
+const adminAppRouter = require('./routes/adminApp');
+
 
     
-    
-    
+const initialize = () => {
     //Drop command. Please be carefull!!
     dropTables(db);
     dropTransactionTable(transactions_db);
-
-
-
     //Creating tables. Please be careful!
     createTables(db);  
     createTransactionTable(transactions_db); 
-
-
     //Inserting Sample Data. Please be careful!
     insertDummyData(db, transactions_db);
+}
+
+
+    //Please be careful. Dont run this command if you have data in backend.
+    //initialize();
     
-    
-   
      //Routes
     server.use('/userApp', userAppRouter);
+    server.use('/adminApp', adminAppRouter);
 
-
-    
-
-    
     //Thread listening on port PORT
     server.listen(port,  (err) => {
         if(err){

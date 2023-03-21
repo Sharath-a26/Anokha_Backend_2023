@@ -1,0 +1,5 @@
+module.exports = {
+    getUsers : (req, res) => {
+            res.json({"OK" : "FUCK"});
+    }
+}
