@@ -21,7 +21,7 @@ const createTables = (db) => {
         }
     });
 
-    db.query("create table EventManager (eventManagerEmail varchar(65) PRIMARY KEY,name varchar(50) NOT NULL,password varchar(25) NOT NULL,timeStamp datetime NOT NULL,managerPhoneNumber char(10) NOT NULL)",(err,result) => {
+    db.query("create table EventManager (eventManagerEmail varchar(65) PRIMARY KEY,name varchar(50) NOT NULL,password varchar(25) NOT NULL,timeStamp datetime NOT NULL,managerPhoneNumber char(10) NOT NULL unique)",(err,result) => {
         if(err) {
             console.log("Failed to create ErrorManager table");
         }
@@ -40,7 +40,7 @@ const createTables = (db) => {
         }
     });
 
-    db.query("create table CrewDetails (teamId int PRIMARY KEY AUTO_INCREMENT,teamName varchar(50) NOT NULL)", (err,result) => {
+    db.query("create table CrewDetails (teamId int PRIMARY KEY AUTO_INCREMENT,teamName varchar(50) NOT NULL unique)", (err,result) => {
         if(err) {
             console.log("Failed to create CrewDetails table");
         }
@@ -59,7 +59,7 @@ const createTables = (db) => {
         }
     });
     
-    db.query("create table CrewMembers (crewEmail varchar(65) primary key, name varchar(50) not null, departmentAbbr varchar(10),  teamId int, role varchar(50) not null,  foreign key (departmentAbbr) references DepartmentData(departmentAbbr), foreign key (teamId) references CrewDetails(teamId))", (err, result) => {
+    db.query("create table CrewMembers (crewEmail varchar(65) primary key, name varchar(50) not null, departmentAbbr varchar(10) not null,  teamId int not null, role varchar(50) not null,  foreign key (departmentAbbr) references DepartmentData(departmentAbbr), foreign key (teamId) references CrewDetails(teamId))", (err, result) => {
         if(err)
         {
             console.log("Failed to create CrewMembers table");
@@ -81,7 +81,7 @@ const createTables = (db) => {
 
     
 
-    db.query("create table EventData (eventId int PRIMARY KEY AUTO_INCREMENT, eventName varchar(50) NOT NULL,eventOrWorkshop boolean NOT NULL,description varchar(500) NOT NULL,eventManagerEmail varchar(65),date varchar(20) NOT NULL,eventTime time NOT NULL,venue varchar(50) NOT NULL,fees int NOT NULL,totalNumberOfSeats int NOT NULL,noOfRegistrations int NOT NULL,timeStamp datetime NOT NULL,refundable boolean NOT NULL,departmentAbbr varchar(10),FOREIGN KEY(departmentAbbr) REFERENCES DepartmentData(departmentAbbr),FOREIGN KEY(eventManagerEmail) REFERENCES EventManager(eventManagerEmail))", (err,result) => {
+    db.query("create table EventData (eventId int PRIMARY KEY AUTO_INCREMENT, eventName varchar(50) NOT NULL,eventOrWorkshop boolean NOT NULL,description varchar(500) NOT NULL,eventManagerEmail varchar(65) not null,date varchar(20) NOT NULL,eventTime time NOT NULL,venue varchar(50) NOT NULL,fees int NOT NULL,totalNumberOfSeats int NOT NULL,noOfRegistrations int NOT NULL,timeStamp datetime NOT NULL,refundable boolean NOT NULL,departmentAbbr varchar(10) not null,FOREIGN KEY(departmentAbbr) REFERENCES DepartmentData(departmentAbbr),FOREIGN KEY(eventManagerEmail) REFERENCES EventManager(eventManagerEmail))", (err,result) => {
         if(err) {
             console.log("Failed to create EventData table");
         }

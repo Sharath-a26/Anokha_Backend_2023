@@ -4,7 +4,7 @@ const dropTransactionsTable = (transactions_db) => {
             console.log("Error while dropping transaction table");
         }
         else {
-            console.log("Transactions table dropped");
+            console.log("Succesfully dropped Transactions table");
         }
     });
 }
