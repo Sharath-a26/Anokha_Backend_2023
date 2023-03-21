@@ -13,7 +13,7 @@ const port = 3000;
 
 
 //Creating master and slave threads
-if(cluster.isMaster){
+
     
     
     
@@ -32,16 +32,9 @@ if(cluster.isMaster){
     insertDummyData(db, transactions_db);
     
     
-    //Creating threads
-    console.log(`Master Process is creating ${numCPUs} threads`);
-    for (let i = 0; i < numCPUs; i++) {
-        cluster.fork();
-        console.log(`Process ${i} created...`)
-      }
+   
      
-}
 
-else{
 
     
 
@@ -61,7 +54,7 @@ else{
 
     
    
-  }
+  
 
 
 
