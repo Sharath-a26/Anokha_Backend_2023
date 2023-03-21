@@ -9,5 +9,22 @@ module.exports = {
                 res.send(result);
             }
         });
-    }
+    },
+
+    getUserDetails : (req,res) => {
+        console.log(req.params.userEmail);
+        let sql_q = `select * from UserData where userEmail = '${req.params.userEmail}'`;
+        db.query(
+            sql_q,(err,result) => {
+                if(err){
+                    console.log(err);
+                }
+                else {
+                res.send(result);
+                }
+            }
+        )
+    },
+
+
 }
