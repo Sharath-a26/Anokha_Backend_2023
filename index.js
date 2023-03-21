@@ -7,6 +7,7 @@ const cluster = require('cluster');
 const { pid } = require('process');
 const numCPUs = require('os').cpus().length;
 const {db, transactions_db} = require('./connection');
+const insertDummyData = require('./SampleData/dummyData');
 const server = express();
 const port = 3000;
 
@@ -16,15 +17,19 @@ if(cluster.isMaster){
     
     
     
-    //Drop command. Be carefull!!
+    //Drop command. Please be carefull!!
     dropTables(db);
     dropTransactionTable(transactions_db);
 
 
 
-    //Creating tables
+    //Creating tables. Please be careful!
     createTables(db);  
     createTransactionTable(transactions_db); 
+
+
+    //Inserting Sample Data. Please be careful!
+    insertDummyData(db, transactions_db);
     
     
     //Creating threads
