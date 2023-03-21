@@ -4,9 +4,35 @@ module.exports = {
         db.query("SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr", (err, result) => {
             if(err){
                 console.log("Error in query");
+                res.send("Query Error... Contact DB Admin");
             }
             else{
-                res.send(result);
+
+                var jsonResponse = [];
+                var eventsByDepartment = {};
+                var department = "";
+                result.forEach(eventData => {
+                    if(eventData.departmentAbbr == department)
+                    {
+                       eventsByDepartment["events"].push(eventData);
+                    }
+                    else
+                    {
+                        if(department != "")
+                        {
+                            jsonResponse.push(eventsByDepartment);
+                        }
+                        eventsByDepartment = {
+                            department : eventData.departmentName,
+                            events : [eventData]
+                        }
+                        department = eventData.departmentAbbr;
+
+                    }
+                });
+                res.send(jsonResponse);
+                
+
             }
         });
     },
@@ -18,9 +44,10 @@ module.exports = {
             sql_q,(err,result) => {
                 if(err){
                     console.log(err);
+                    res.send("Query Error... Contact DB Admin");
                 }
                 else {
-                res.send(result);
+                res.send(result[0]);
                 }
             }
         )
