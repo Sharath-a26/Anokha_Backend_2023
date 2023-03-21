@@ -1,0 +1,23 @@
+{
+  "name": "anokha_backend_2023",
+  "version": "1.0.0",
+  "description": "Ohoo! Anokha is Back!",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kvaisakhkrishnan/Anokha_Backend_2023.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kvaisakhkrishnan/Anokha_Backend_2023/issues"
+  },
+  "homepage": "https://github.com/kvaisakhkrishnan/Anokha_Backend_2023#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql": "^2.18.1"
+  }
+}
