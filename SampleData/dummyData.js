@@ -19,13 +19,7 @@ const insertDummyData = (db, transactions_db) => {
 
     }
     
-
-
 }
-
-
-
-
 
 module.exports = insertDummyData;
 
