@@ -20,7 +20,7 @@ module.exports = {
                     console.log(err);
                 }
                 else {
-                res.send(result);
+                res.send(result[0]);
                 }
             }
         )
