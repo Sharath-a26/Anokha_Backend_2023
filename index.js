@@ -10,9 +10,7 @@ const {db, transactions_db} = require('./connection');
 const insertDummyData = require('./SampleData/dummyData');
 const server = express();
 const port = 3000;
-
-
-//Creating master and slave threads
+const userAppRouter = require('./routes/userApp');
 
     
     
@@ -33,7 +31,8 @@ const port = 3000;
     
     
    
-     
+     //Routes
+    server.use('/userApp', userAppRouter);
 
 
     
@@ -49,7 +48,7 @@ const port = 3000;
         }
     })
 
-    //Routes
+    
    
 
     
