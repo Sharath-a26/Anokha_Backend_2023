@@ -2,7 +2,7 @@ const { db, transactions_db } = require('../connection');
 const tokenGenerator = require('../middleware/tokenGenerator');
 const tokenValidator = require('../middleware/tokenValidator');
 module.exports = {
-    getEventsByDepartment : (req, res) => {
+    getEventsByDepartment : [tokenValidator, (req, res) => {
         let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
         db.query(sql_q, (err, result) => {
             if(err){
@@ -38,7 +38,7 @@ module.exports = {
 
             }
         });
-    },
+    }],
 
     getUserDetails : (req,res) => {
         console.log(req.params.userEmail);

@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/kvaisakhkrishnan/Anokha_Backend_2023#readme",
   "dependencies": {
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "mysql": "^2.18.1"
