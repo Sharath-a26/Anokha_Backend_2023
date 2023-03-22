@@ -86,6 +86,20 @@ const tokenValidator = require('../middleware/tokenValidator');
                 }
             }
         })
-    }
+    },
+
+    registeredUsers : [tokenValidator,(req,res) => {
+        let sql = `select * from userData where userEmail in (select userEmail from registeredevents where eventId in 
+            (select eventId from eventData where eventName = '${req.params.eventName}'));`
+
+        db.query(sql,(err,result) => {
+            if(err) {
+                res.send("Query Error")
+            }
+            else {
+                 res.send(result)
+            }
+        })
+    }]
 }
 

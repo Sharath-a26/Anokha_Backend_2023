@@ -8,4 +8,6 @@ router.get("/getEventDetails/:eventManagerEmail", adminController.getEventDetail
 router.post("/event/createEvent", adminController.createEvent);
 router.post("/login", adminController.adminLogin);
 
+router.get('/getRegisteredUsers/:eventName',adminController.registeredUsers)
+
 module.exports = router;
