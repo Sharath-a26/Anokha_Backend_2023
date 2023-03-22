@@ -6,8 +6,8 @@ module.exports = {
         let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
         db.query(sql_q, (err, result) => {
             if(err){
-                console.log("Error in query");
-                res.send("Query Error... Contact DB Admin");
+                console.log("Error in query getEventsByDepartment");
+                res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else{
 
@@ -33,60 +33,57 @@ module.exports = {
 
                     }
                 });
-                res.send(jsonResponse);
+                res.status(200).send(jsonResponse);
                 
 
             }
         });
     }],
 
-    getUserDetails : (req,res) => {
+    getUserDetails : [tokenValidator,(req,res) => {
         console.log(req.params.userEmail);
         let sql_q = `select * from UserData where userEmail = '${req.params.userEmail}'`;
         db.query(
             sql_q,(err,result) => {
                 if(err){
-                    console.log(err);
-                    res.send("Query Error... Contact DB Admin");
+                    console.log("Error in query getUserDetails");
+                    res.status(500).send({error : "Query Error... Contact DB Admin"});
                 }
                 else {
-                res.send(result[0]);
+                res.status(200).send(result[0]);
                 }
             }
         )
-    },
+    }],
 
-    editUserDetails: (req,res) => {
+    editUserDetails: [tokenValidator, (req,res) => {
         const data = req.body;
-        const user_mail = req.params.userEmail;
-        let sql = `Update userData SET userEmail = '${req.body.userEmail}',fullName = '${req.body.fullName}',password = '${req.body.password}',currentStatus = '${req.body.currentStatus}',activePassport = '${req.body.activePassport}',isAmritaCBE = '${req.body.isAmritaCBE}',collegeId = '${req.body.collegeId}' where userEmail = '${req.params.userEmail}'`
+        let sql = `Update userData SET fullName = '${req.body.fullName}',password = '${req.body.password}',currentStatus = '${req.body.currentStatus}',activePassport = '${req.body.activePassport}',isAmritaCBE = '${req.body.isAmritaCBE}',collegeId = '${req.body.collegeId}' where userEmail = '${req.body.userEmail}'`
         db.query(sql,(err,result,fields) => {
             if(err) {
-                console.log(err);
-                console.log("Error while editing profile")
+                console.log("Error in query editUserDetails");
+                res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else {
-                res.send("Updated Successfully")
+                res.status(200).send({result : "Updated Successfully"})
                 
             }
         })
-    }
+    }]
 ,
 
     userLogin : (req, res) => {
         let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = '${req.body.userEmail}' and password = '${req.body.password}'`
         db.query(sql_q, (err, result) => {
             if(err){
-                console.log("Error in query");
-                res.send("Query Error... Contact DB Admin");
+                console.log("Error in query userLogin");
+                res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else
             {
                 if(result.length == 0)
                 {
-                    res.json({
-                        status : 0
-                    });
+                    res.status(404).send({error : "User not found"})
                 }
                 else{
 
@@ -95,8 +92,7 @@ module.exports = {
                             password : req.body.password
                         });
                         res.json({
-                            status : 1,
-                            details : {
+                            
                                 userEmail : result[0].userEmail,
                                 fullName : result[0].fullName,
                                 activePassport : result[0].activePassport,
@@ -106,7 +102,7 @@ module.exports = {
                                 state : result[0].state,
                                 country : result[0].country,
                                 SECRET_TOKEN : token
-                            }
+                            
                         });
                     
                 }
