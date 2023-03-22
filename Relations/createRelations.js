@@ -49,7 +49,7 @@ const createTables = (db) => {
         }
     });
 
-    db.query("CREATE TABLE UserData (userEmail VARCHAR(65) PRIMARY KEY, fullName VARCHAR(50) NOT NULL, password VARCHAR(25) NOT NULL, currentStatus BOOLEAN NOT NULL, activePassport BOOLEAN NOT NULL, isAmritaCBE BOOLEAN NOT NULL, collegeId INT NOT NULL, accountTimeStamp DATETIME NOT NULL, passportId VARCHAR(25) UNIQUE, passportTimeStamp DATETIME NOT NULL, FOREIGN KEY (collegeId) REFERENCES CollegeData (collegeId));", (err, result) => {
+    db.query("CREATE TABLE UserData (userEmail VARCHAR(65) PRIMARY KEY, fullName VARCHAR(50) NOT NULL, password VARCHAR(25) NOT NULL, currentStatus BOOLEAN NOT NULL, activePassport BOOLEAN NOT NULL, isAmritaCBE BOOLEAN NOT NULL, collegeId INT NOT NULL, accountTimeStamp DATETIME NOT NULL, passportId VARCHAR(25) UNIQUE, passportTimeStamp DATETIME, FOREIGN KEY (collegeId) REFERENCES CollegeData (collegeId));", (err, result) => {
         if(err)
         {
             console.log("Failed to create UserData table");

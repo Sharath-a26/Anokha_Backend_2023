@@ -1,6 +1,7 @@
 const { db, transactions_db } = require('../connection');
 const tokenGenerator = require('../middleware/tokenGenerator');
 const tokenValidator = require('../middleware/tokenValidator');
+const randonNumberGenerator = require('../OTPGenerator/otp');
 module.exports = {
     getEventsByDepartment : [tokenValidator, (req, res) => {
         let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
@@ -108,6 +109,49 @@ module.exports = {
                 }
             }
         })
+    },
+
+    registerUser : (req, res) =>{
+
+       
+        if(req.body.collegeId == 1)
+        {
+            if(req.body.userEmail.includes("@cb.amrita.edu") || req.body.userEmail.includes("@cb.students.amrita.edu"))
+            {
+                //User is from Amrita CBE with Amrita Email
+                //Need tp verify credibility
+            }
+            else
+            {
+                //User claims to be from Amrita CBE
+                //Email is not under Amrita domain
+                //Credibility cannot be verified
+                res.status(400).send({"error" : "invalid email"});
+                return;
+            }
+        }
+        else{
+
+            //User is not from Amrita CBE
+            //Need tp verify credibility of email given
+            
+        }
+
+        const otpGenerated = randonNumberGenerator();
+        db.query(`delete from OTP where userEmail = '${req.body.userEmail}'`, (err, res) => {});
+        db.query(`insert into OTP (userEmail, otp) values ('${req.body.userEmail}', ${otpGenerated})`, (err, result)=> {
+            if(err)
+            {
+                console.log(err);
+                console.log("Error in query userLogin");
+                res.status(500).send({error : "Query Error... Contact DB Admin"});
+            }
+            else{
+                res.status(200).send({"result" : "OK"});
+            }
+        });
+
+        
     }
 
 
