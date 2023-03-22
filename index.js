@@ -1,4 +1,5 @@
 const express = require('express')
+require('dotenv').config()
 const createTables = require('./Relations/createRelations');
 const dropTables = require('./Relations/dropRelations');
 const createTransactionTable = require('./Relations/createTransactionsTable')
@@ -9,7 +10,6 @@ const numCPUs = require('os').cpus().length;
 const {db, transactions_db} = require('./connection');
 const insertDummyData = require('./SampleData/dummyData');
 const server = express();
-const port = 3000;
 const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
 
@@ -37,12 +37,12 @@ const initialize = () => {
     server.use('/adminApp', adminAppRouter);
 
     //Thread listening on port PORT
-    server.listen(port,  (err) => {
+    server.listen(process.env.PORT,  (err) => {
         if(err){
             console.log("Error starting server");
         }
         else{
-            console.log(`Process ${pid} listening on port ${port}`)
+            console.log(`Process ${pid} listening on port ${process.env.PORT}`)
         }
     })
 

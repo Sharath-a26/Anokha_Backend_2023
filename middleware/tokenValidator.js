@@ -10,12 +10,12 @@ function tokenValidator(req, res, next){
    if(token == null)
    {
     
-        res.status(401).send({"error" : "Better Luck Next Time..."});
+        res.status(401).send({"error" : "You need to be way more better for this..."});
         return ;
    }
    jwt.verify(token, secret_key, (err, result) => {
     if(err){
-        res.status(403).send({"error" : "Expired Token"});
+        res.status(403).send({"error" : "Wrong Token or Token Expired..."});
         return ;
         
     }
