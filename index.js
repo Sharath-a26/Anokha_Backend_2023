@@ -30,6 +30,8 @@ const initialize = () => {
     //Please be careful. Dont run this command if you have data in backend.
     //initialize();
     
+    server.use(express.json());
+    
      //Routes
     server.use('/userApp', userAppRouter);
     server.use('/adminApp', adminAppRouter);

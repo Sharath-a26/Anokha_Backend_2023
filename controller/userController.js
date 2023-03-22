@@ -1,4 +1,5 @@
 const { db, transactions_db } = require('../connection');
+const tokenGenerator = require('../middleware/tokenGenerator');
 module.exports = {
     getEventsByDepartment : (req, res) => {
         let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
@@ -72,7 +73,7 @@ module.exports = {
 ,
 
     userLogin : (req, res) => {
-        let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = '${req.params.userEmail}' and password = '${req.params.password}'`
+        let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = '${req.body.userEmail}' and password = '${req.body.password}'`
         db.query(sql_q, (err, result) => {
             if(err){
                 console.log("Error in query");
@@ -87,7 +88,11 @@ module.exports = {
                     });
                 }
                 else{
-                    
+
+                        const token = tokenGenerator({
+                            userEmail : req.body.userEmail,
+                            password : req.body.password
+                        });
                         res.json({
                             status : 1,
                             details : {
@@ -98,7 +103,8 @@ module.exports = {
                                 collegeName : result[0].collegeName,
                                 district : result[0].district,
                                 state : result[0].state,
-                                country : result[0].country
+                                country : result[0].country,
+                                SECRET_TOKEN : token
                             }
                         });
                     
