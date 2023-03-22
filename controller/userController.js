@@ -26,5 +26,21 @@ module.exports = {
         )
     },
 
+    editUserDetails: (req,res) => {
+        const data = req.body;
+        const user_mail = req.params.userEmail;
+        let sql = `Update userData SET userEmail = '${req.body.userEmail}',fullName = '${req.body.fullName}',password = '${req.body.password}',currentStatus = '${req.body.currentStatus}',activePassport = '${req.body.activePassport}',isAmritaCBE = '${req.body.isAmritaCBE}',collegeId = '${req.body.collegeId}' where userEmail = '${req.params.userEmail}'`
+        db.query(sql,(err,result,fields) => {
+            if(err) {
+                console.log(err);
+                console.log("Error while editing profile")
+            }
+            else {
+                res.send("Updated Successfully")
+                
+            }
+        })
+    }
+
 
 }
