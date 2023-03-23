@@ -11,7 +11,7 @@ const createTables = (db) => {
 
     
 
-    db.query("create table OTP (userEmail varchar(65) primary key, otp int unique not null);", (err, res) => {
+    db.query("create table OTP (userEmail varchar(65) primary key, otp int unique not null, fullName VARCHAR(50) NOT NULL, password VARCHAR(25) NOT NULL, currentStatus BOOLEAN NOT NULL, activePassport BOOLEAN NOT NULL, isAmritaCBE BOOLEAN NOT NULL, collegeId INT NOT NULL, accountTimeStamp DATETIME NOT NULL, passportId VARCHAR(25) UNIQUE, passportTimeStamp DATETIME);", (err, res) => {
         if(err)
         {
             console.log("Failed to create OTP table")
@@ -107,6 +107,9 @@ const createTables = (db) => {
             console.log("StarredEvents table created succesfully");  
         }
     })
+
+
+    
 
 
 

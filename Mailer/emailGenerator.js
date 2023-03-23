@@ -1,5 +1,6 @@
 const mailer = require('nodemailer');
-var transporter = mailer.createTransport({
+const otpMailer = (random_number) => {
+  var transporter = mailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'kvaisakhkrishnan@gmail.com',
@@ -27,3 +28,6 @@ var transporter = mailer.createTransport({
           console.log('Email sent: ' + info.response);
         }
       });
+}
+
+module.exports = otpMailer;
