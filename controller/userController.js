@@ -12,6 +12,7 @@ module.exports = {
             }
             else{
 
+
                 var jsonResponse = [];
                 var eventsByDepartment = {};
                 var department = "";
@@ -43,6 +44,7 @@ module.exports = {
 
     getUserDetails : [tokenValidator, (req,res) => {
         console.log(req.params.userEmail);
+        
         let sql_q = `select * from UserData where userEmail = '${req.params.userEmail}'`;
         db.query(
             sql_q,(err,result) => {
@@ -51,10 +53,19 @@ module.exports = {
                     res.status(500).send({error : "Query Error... Contact DB Admin"});
                 }
                 else {
-                res.status(200).send(result[0]);
+
+                    if(result == [])
+                    {res.status(200).send([]);
+
+                    }
+                    else{
+                        res.status(200).send(result[0]);
+                    }
+                
                 }
             }
         )
+        
     }],
 
     editUserDetails: [tokenValidator, (req,res) => {
