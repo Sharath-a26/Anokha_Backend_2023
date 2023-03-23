@@ -57,7 +57,7 @@ const tokenValidator = require('../middleware/tokenValidator');
 
      adminLogin :  (req, res) => {
         let sql_q = `select * from EventManager where eventManagerEmail = '${req.body.eventManagerEmail}' and password = '${req.body.password}'`
-        db.query(sql_q, (err, result) => {
+        db.query(sql_q, async (err, result) => {
             if(err){
                 console.log("Error in query userLogin");
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
@@ -70,7 +70,7 @@ const tokenValidator = require('../middleware/tokenValidator');
                 }
                 else{
 
-                        const token = tokenGenerator({
+                        const token = await tokenGenerator({
                             eventManagerEmail : req.body.eventManagerEmail,
                             password : req.body.password
                         });
