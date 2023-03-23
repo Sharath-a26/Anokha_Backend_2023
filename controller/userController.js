@@ -88,9 +88,12 @@ module.exports = {
 ,
 
     userLogin : (req, res) => {
+        console.log(req.body.userEmail);
+        console.log(req.body.password);
         let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = '${req.body.userEmail}' and password = '${req.body.password}'`
         db.query(sql_q, async (err, result) => {
             if(err){
+                console.log(err)
                 console.log("Error in query userLogin");
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
@@ -221,7 +224,41 @@ module.exports = {
             }
         })
 
-    }]
+    }],
+
+    insertStarredEvent : [
+        tokenGenerator,(req,res) => {
+            const data = req.body;
+            let user_email = req.body.userEmail;
+            let event_name = req.body.eventName;
+            let sql_q = `insert into starredevents values ((select eventId from eventdata where eventName = '${event_name}'),'${user_email}')`
+    
+            db.query(sql_q,(err,result,fields) => {
+                if(err) {
+                    res.sendStatus(404);
+                }
+                else {
+                    res.send("Inserted successfully")
+                }
+            })
+        }
+    ],
+
+    dropStarredEvent : [
+        tokenGenerator,(req,res) => {
+            let user_email = req.body.userEmail;
+            let event_name = req.body.eventName;
+            let sql_q = `delete from starredevents where userEmail = '${user_email}' and eventId = (select eventId from eventData where eventName = '${event_name}')`;
+            db.query(sql_q,(err,result,fields) => {
+                if(err) {
+                    res.sendStatus(err)
+                }
+                else {
+                    res.send("Deleted successfully")
+                }
+            })
+        }
+    ]
 
 
 }
