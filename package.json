@@ -21,8 +21,11 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "nodemailer": "^6.9.1",
-    "random-number": "^0.0.9"
+    "paseto": "^3.1.2",
+    "random-number": "^0.0.9",
+    "tweetnacl": "^1.0.3"
   }
 }

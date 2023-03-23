@@ -1,8 +1,9 @@
-require('dotenv').config()
-const jwt = require('jsonwebtoken');
-const secret_key = process.env.SECRET_ACCESS_TOKEN;
-function createJsonWebToken(data) {
-    const token = jwt.sign(data, secret_key, {expiresIn: 86400});
+const paseto = require('paseto');
+const { V4: { sign } } = paseto;
+const fs = require('fs');
+async function createWebToken(data) {
+    const privateKey = fs.readFileSync('./AssymetricKeyPair/private_key.pem');
+    const token = await sign(data, privateKey, { expiresIn: "15 m" });
     return token;
 }
-module.exports = createJsonWebToken;
+module.exports = createWebToken;

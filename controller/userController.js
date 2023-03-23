@@ -3,7 +3,7 @@ const tokenGenerator = require('../middleware/tokenGenerator');
 const tokenValidator = require('../middleware/tokenValidator');
 const randonNumberGenerator = require('../OTPGenerator/otp');
 module.exports = {
-    getEventsByDepartment : (req, res) => {
+    getEventsByDepartment : [tokenValidator, (req, res) => {
         let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
         db.query(sql_q, (err, result) => {
             if(err){
@@ -39,9 +39,9 @@ module.exports = {
 
             }
         });
-    },
+    }],
 
-    getUserDetails : (req,res) => {
+    getUserDetails : [tokenValidator, (req,res) => {
         console.log(req.params.userEmail);
         let sql_q = `select * from UserData where userEmail = '${req.params.userEmail}'`;
         db.query(
@@ -55,9 +55,9 @@ module.exports = {
                 }
             }
         )
-    },
+    }],
 
-    editUserDetails:  (req,res) => {
+    editUserDetails: [tokenValidator, (req,res) => {
         const data = req.body;
         let sql = `Update userData SET fullName = '${req.body.fullName}',password = '${req.body.password}',currentStatus = '${req.body.currentStatus}',activePassport = '${req.body.activePassport}',isAmritaCBE = '${req.body.isAmritaCBE}',collegeId = '${req.body.collegeId}' where userEmail = '${req.body.userEmail}'`
         db.query(sql,(err,result,fields) => {
@@ -70,12 +70,12 @@ module.exports = {
                 
             }
         })
-    }
+    }]
 ,
 
     userLogin : (req, res) => {
         let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = '${req.body.userEmail}' and password = '${req.body.password}'`
-        db.query(sql_q, (err, result) => {
+        db.query(sql_q, async (err, result) => {
             if(err){
                 console.log("Error in query userLogin");
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
@@ -88,7 +88,7 @@ module.exports = {
                 }
                 else{
 
-                        const token = tokenGenerator({
+                        const token = await tokenGenerator({
                             userEmail : req.body.userEmail,
                             password : req.body.password
                         });
@@ -110,6 +110,7 @@ module.exports = {
             }
         })
     },
+    
 
     registerUser : (req, res) =>{
 
@@ -155,7 +156,7 @@ module.exports = {
     },
 
 
-    verifyOTP : (req, res) => {
+    verifyOTP :[tokenValidator, (req, res) => {
         const otp = req.body.otp;
         const userEmail = req.body.userEmail;
 
@@ -178,7 +179,7 @@ module.exports = {
             }
         })
 
-    }
+    }]
 
 
 }

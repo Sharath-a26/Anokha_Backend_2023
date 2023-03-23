@@ -12,6 +12,7 @@ const insertDummyData = require('./SampleData/dummyData');
 const server = express();
 const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
+const keyGenerator = require('./AssymetricKeyPair/key');
 
 
     
@@ -24,6 +25,9 @@ const initialize = () => {
     createTransactionTable(transactions_db); 
     //Inserting Sample Data. Please be careful!
     insertDummyData(db, transactions_db);
+
+    //Key Generator
+    keyGenerator();
 }
 
 
