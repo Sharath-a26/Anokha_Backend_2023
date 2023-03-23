@@ -100,6 +100,6 @@ const tokenValidator = require('../middleware/tokenValidator');
                  res.send(result)
             }
         })
-    }]
+    }]  
 }
 
