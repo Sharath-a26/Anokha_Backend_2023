@@ -96,6 +96,7 @@ module.exports = {
             if(err){
                 console.log(err)
                 console.log("Error in query userLogin");
+
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else
@@ -312,7 +313,7 @@ module.exports = {
         tokenValidator,(req,res) => {
             let team_name = req.params.teamName;
             console.log(req.params.teamName);
-            let sql_q = `select * from crewMembers where teamId = (select teamId from crewDetails where teamName = '${team_name}')`;
+            let sql_q = `select crewEmail,name,departmentAbbr,role,crewmembers.teamId from crewmembers left join crewdetails on crewmembers.teamId = crewdetails.teamId`;
     
             db.query(sql_q,(err,result) => {
                 if(err) {
