@@ -202,7 +202,7 @@ module.exports = {
                                         password : req.body.password
                                     });
                                     //sending OTP to user
-                                    mailer(otpGenerated);
+                                    mailer(req.body.fullName, req.body.userEmail, otpGenerated);
                                     res.status(200).send({SECRET_TOKEN : token});
                                 }
                             });
@@ -241,7 +241,7 @@ module.exports = {
                     const istTime = now.toISOString().slice(0, 19).replace('T', ' ');   
                     db.query(`insert into UserData (userEmail, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values ('${result[0].userEmail}', '${result[0].fullName}', '${result[0].password}', ${result[0].currentStatus}, ${0}, ${result[0].isAmritaCBE}, ${result[0].collegeId}, '${istTime}', ${null}, ${null})`, (err2, result2) => {});
                     db.query(`delete from OTP where userEmail = '${userEmail}'`, (err, result3) => {});
-                    welcomeMailer();
+                    welcomeMailer(result[0].fullName, userEmail);
                     res.status(200).send({"result" : "success"})
                 }
                 else{
@@ -314,7 +314,7 @@ module.exports = {
             console.log(req.params.teamName);
             let sql_q = `select * from crewMembers where teamId = (select teamId from crewDetails where teamName = '${team_name}')`;
     
-            db.query(sql_q,(err,result,fields) => {
+            db.query(sql_q,(err,result) => {
                 if(err) {
                     res.send(err);
                 }

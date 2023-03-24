@@ -1,6 +1,6 @@
 const mailer = require('nodemailer');
 const fs = require('fs');
-const welcomeMailer = () => {
+const welcomeMailer = (fullName, userEmail) => {
   var transporter = mailer.createTransport({
     service: 'gmail',
     auth: {
@@ -9,27 +9,21 @@ const welcomeMailer = () => {
     }
 });
 
-   const data = fs.readFileSync('../htmlDocuments/welcomeHTML.html');
-  console.log(data.toString());
+
+  const data = fs.readFileSync('htmlDocuments/welcomeHTML.html').toString();
+  const finaldata = data.replace('%= name %', fullName);
     
-    
-    
+
     var mailOptions = {
-        from: 'kvaisakhkrishnan@gmail.com',
-        to: 'cb.en.u4cse20069@cb.students.amrita.edu',
-        subject: 'Welcome',
-        html: data.toString()
+        from: 'Anokha 2023',
+        to: userEmail,
+        subject: 'Welcome to Anokha 2023: Unleash Your Genius at Amrita Vishwa Vidyapeetham, Coimbatore!',
+        html: finaldata
       }
     
     
     
-      transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
+      transporter.sendMail(mailOptions, function(error, info){});
 }
 welcomeMailer();
 module.exports = welcomeMailer;

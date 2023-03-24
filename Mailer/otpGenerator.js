@@ -1,5 +1,6 @@
 const mailer = require('nodemailer');
-const otpMailer = (random_number) => {
+const fs = require('fs');
+const otpMailer = (fullName, userEmail, otp) => {
   var transporter = mailer.createTransport({
     service: 'gmail',
     auth: {
@@ -8,26 +9,26 @@ const otpMailer = (random_number) => {
     }
 });
 
-   
-    
-    
-    
-    var mailOptions = {
-        from: 'kvaisakhkrishnan@gmail.com',
-        to: 'cb.en.u4cse20069@cb.students.amrita.edu',
-        subject: 'Anokha 2023 Password Reset Confirmation',
-        html: `<p>${random_number}</p>`
-      }
-    
-    
-    
-      transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-}
 
+const data = fs.readFileSync('htmlDocuments/otpVerification.html').toString();
+const finaldata = data.replace('%= name %', fullName).replace('%= otp %', otp);
+
+  
+
+  
+  
+  var mailOptions = {
+      from: 'Anokha 2023',
+      to: userEmail,
+      subject: 'OTP Verification for Anokha 2023',
+      html: finaldata
+    }
+    
+  
+    
+    
+    
+      transporter.sendMail(mailOptions, function(error, info){});
+}
+otpMailer();
 module.exports = otpMailer;
