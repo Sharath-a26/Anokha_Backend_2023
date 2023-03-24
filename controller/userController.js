@@ -4,7 +4,7 @@ const tokenValidator = require('../middleware/tokenValidator');
 const otpTokenGenerator = require('../middleware/otpTokenGenerator');
 const otpTokenValidator = require('../middleware/otpTokenValidator');
 const randonNumberGenerator = require('../OTPGenerator/otp');
-const mailer = require('../Mailer/emailGenerator');
+const mailer = require('../Mailer/otpGenerator');
 const welcomeMailer = require('../Mailer/welcomeMailer');
 module.exports = {
     getEventsByDepartment : [tokenValidator, (req, res) => {
@@ -296,21 +296,18 @@ module.exports = {
         }
     ],
 
-    getUserStarrs : [
-        tokenValidator,(req,res) => {
-            
-            let sql_q = `select * from eventData where eventId in (select eventId from starredEvents where userEmail = '${req.params.userEmail}')`
-            db.query(sql_q,(err,result) => {
-                if(err) {
-                    console.log(err);
-                    res.sendStatus(404).send({"error":"Send valid email"})
-                }
-                else {
-                    res.send(result)
-                }
-            })
-        }
-    ],
+    getStarredEvents : [tokenValidator, (req, res) => {
+        db.query(`select * from starredevents LEFT JOIN  eventdata ON starredevents.eventId = eventdata.eventId where userEmail = '${req.params.userEmail}'`, (err, result) =>  {
+            if(err)
+            {
+                console.log("Error in query getStarredEvents");
+                req.status(500).send({"error" : "error in db query... contact db admin"});
+            }
+            else{
+                res.status(200).send(result);
+            }
+        })
+    }],
 
     getCrewDetails : [
         tokenValidator,(req,res) => {
@@ -328,6 +325,7 @@ module.exports = {
             })
         }
     ]
+
 
 
 
