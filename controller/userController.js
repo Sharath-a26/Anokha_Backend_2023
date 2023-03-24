@@ -255,7 +255,8 @@ module.exports = {
 
 
     insertStarredEvent : [
-        tokenValidator,(req,res) => {
+        tokenGenerator,(req,res) => {
+            const data = req.body;
             let user_email = req.body.userEmail;
             let event_id = req.body.eventId;
             let sql_q = `insert into starredevents values (${event_id},'${user_email}')`
@@ -305,7 +306,27 @@ module.exports = {
                 res.status(200).send(result);
             }
         })
-    }]
+    }],
+
+    getCrewDetails : [
+        tokenValidator,(req,res) => {
+            let team_name = req.params.teamName;
+            console.log(req.params.teamName);
+            let sql_q = `select * from crewMembers where teamId = (select teamId from crewDetails where teamName = '${team_name}')`;
+    
+            db.query(sql_q,(err,result,fields) => {
+                if(err) {
+                    res.send(err);
+                }
+                else {
+                    res.send(result)
+                }
+            })
+        }
+    ]
+
+
+
 
 
 }
