@@ -309,7 +309,26 @@ module.exports = {
                 }
             })
         }
+    ],
+
+    getCrewDetails : [
+        tokenValidator,(req,res) => {
+            let team_name = req.params.teamName;
+            console.log(req.params.teamName);
+            let sql_q = `select * from crewMembers where teamId = (select teamId from crewDetails where teamName = '${team_name}')`;
+    
+            db.query(sql_q,(err,result,fields) => {
+                if(err) {
+                    res.send(err);
+                }
+                else {
+                    res.send(result)
+                }
+            })
+        }
     ]
+
+
 
 
 }

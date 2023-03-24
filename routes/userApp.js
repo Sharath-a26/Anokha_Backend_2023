@@ -11,4 +11,5 @@ router.post('/verifyOTP', userController.verifyOTP);
 router.post('/insertStarrs',userController.insertStarredEvent)
 router.post('/dropStarrs',userController.dropStarredEvent)
 router.get('/getStarrs/:userEmail',controller.getUserStarrs)
+router.get('/getCrew/:teamName',controller.getCrewDetails)
 module.exports = router;
