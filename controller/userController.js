@@ -5,6 +5,7 @@ const otpTokenGenerator = require('../middleware/otpTokenGenerator');
 const otpTokenValidator = require('../middleware/otpTokenValidator');
 const randonNumberGenerator = require('../OTPGenerator/otp');
 const mailer = require('../Mailer/emailGenerator');
+const welcomeMailer = require('../Mailer/welcomeMailer');
 module.exports = {
     getEventsByDepartment : [tokenValidator, (req, res) => {
         let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
@@ -136,63 +137,84 @@ module.exports = {
             req.body.fullName == undefined ||
             req.body.password == undefined ||
             req.body.currentStatus == undefined ||
-            req.body.activePassport == undefined ||
             req.body.isAmritaCBE == undefined ||
-            req.body.collegeId == undefined ||
-            req.body.accountTimeStamp == undefined ||
-            req.body.passportId == undefined || 
-            req.body.passportTimeStamp == undefined)
+            req.body.collegeId == undefined)
             {
                 res.status(400).send({"error" : "You need to be much better to do so..."});
             }
 
             else{
-       
+
+                db.query(`select * from UserData where userEmail = '${req.body.userEmail}'`, (err, result) =>{
+                    if(err)
+                    {
+                        console.log("Error in query registerUser");
+                        res.status(500).send({error : "Query Error... Contact DB Admin"});
+                    }
+                    else{
+                        if(result.length != 0)
+                        {
+                            res.status(409).send({"error" : "user already exists..."});
+                            
+                        }
+                        else{
+
+                            if(req.body.collegeId == 1)
+                            {
+                                if(req.body.userEmail.includes("@cb.amrita.edu") || req.body.userEmail.includes("@cb.students.amrita.edu"))
+                                {
+                                    //User is from Amrita CBE with Amrita Email
+                                    //Need tp verify credibility
+                                }
+                                else
+                                {
+                                    //User claims to be from Amrita CBE
+                                    //Email is not under Amrita domain
+                                    //Credibility cannot be verified
+                                    res.status(400).send({"error" : "invalid email"});
+                                    return;
+                                }
+                            }
+                            else{
+                    
+                                //User is not from Amrita CBE
+                                //Need tp verify credibility of email given
+                                
+                            }
+                    
+                            
+                            const otpGenerated = randonNumberGenerator();
+                            const now = new Date();
+                            now.setUTCHours(now.getUTCHours() + 5);
+                            now.setUTCMinutes(now.getUTCMinutes() + 30);
+                            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                            db.query(`delete from OTP where userEmail = '${req.body.userEmail}'`, (err, res) => {});
+                            db.query(`insert into OTP (userEmail, otp, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values ('${req.body.userEmail}', ${otpGenerated}, '${req.body.fullName}', '${req.body.password}', ${req.body.currentStatus}, ${0}, ${req.body.isAmritaCBE}, ${req.body.collegeId}, '${istTime}', ${null}, ${null})`, async (err, result)=> {
+                                if(err)
+                                {
+                                    
+                                    console.log("Error in query userRegister");
+                                    res.status(500).send({error : "Query Error... Contact DB Admin"});
+                                }
+                                else{
+                                    const token = await otpTokenGenerator({
+                                        userEmail : req.body.userEmail,
+                                        password : req.body.password
+                                    });
+                                    //sending OTP to user
+                                    mailer(otpGenerated);
+                                    res.status(200).send({SECRET_TOKEN : token});
+                                }
+                            });
+
+
+
+                        }
+                    }
+                })
 
        
-        if(req.body.collegeId == 1)
-        {
-            if(req.body.userEmail.includes("@cb.amrita.edu") || req.body.userEmail.includes("@cb.students.amrita.edu"))
-            {
-                //User is from Amrita CBE with Amrita Email
-                //Need tp verify credibility
-            }
-            else
-            {
-                //User claims to be from Amrita CBE
-                //Email is not under Amrita domain
-                //Credibility cannot be verified
-                res.status(400).send({"error" : "invalid email"});
-                return;
-            }
-        }
-        else{
-
-            //User is not from Amrita CBE
-            //Need tp verify credibility of email given
-            
-        }
-
         
-        const otpGenerated = randonNumberGenerator();
-        db.query(`delete from OTP where userEmail = '${req.body.userEmail}'`, (err, res) => {});
-        db.query(`insert into OTP (userEmail, otp, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values ('${req.body.userEmail}', ${otpGenerated}, '${req.body.fullName}', '${req.body.password}', ${req.body.currentStatus}, ${req.body.activePassport}, ${req.body.isAmritaCBE}, ${req.body.collegeId}, '${req.body.accountTimeStamp}', '${req.body.passportId}', '${req.body.passportTimeStamp}')`, async (err, result)=> {
-            if(err)
-            {
-                
-                console.log("Error in query userLogin");
-                res.status(500).send({error : "Query Error... Contact DB Admin"});
-            }
-            else{
-                const token = await otpTokenGenerator({
-                    userEmail : req.body.userEmail,
-                    password : req.body.password
-                });
-                //sending OTP to user
-                mailer(otpGenerated);
-                res.status(200).send({SECRET_TOKEN : token});
-            }
-        });
     }
 
         
@@ -206,16 +228,20 @@ module.exports = {
         db.query(`select * from  OTP where userEmail = '${userEmail}' and otp = ${otp}`, (err, result) => {
             if(err)
             {
-                console.log("Error in query userLogin");
+                console.log("Error in query userRegister");
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else{
                 
                 if(result.length == 1)
                 {
-                    console.log(result);
-                    db.query(`insert into UserData (userEmail, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values ('${result.userEmail}', '${result.fullName}', '${result.password}', ${result.currentStatus}, ${result.activePassport}, ${result.isAmritaCBE}, ${result.collegeId}, '${result.accountTimeStamp}', '${result.passportId}', '${result.passportTimeStamp}'`, (err2, result2) => {});
-                   // db.query(`delete from OTP where userEmail = '${userEmail}'`, (err, result3) => {});
+                    const now = new Date();
+                    now.setUTCHours(now.getUTCHours() + 5);
+                    now.setUTCMinutes(now.getUTCMinutes() + 30);
+                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');   
+                    db.query(`insert into UserData (userEmail, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values ('${result[0].userEmail}', '${result[0].fullName}', '${result[0].password}', ${result[0].currentStatus}, ${0}, ${result[0].isAmritaCBE}, ${result[0].collegeId}, '${istTime}', ${null}, ${null})`, (err2, result2) => {});
+                    db.query(`delete from OTP where userEmail = '${userEmail}'`, (err, result3) => {});
+                    welcomeMailer();
                     res.status(200).send({"result" : "success"})
                 }
                 else{
@@ -225,6 +251,8 @@ module.exports = {
         })
 
     }],
+
+    
 
     insertStarredEvent : [
         tokenGenerator,(req,res) => {
@@ -238,7 +266,7 @@ module.exports = {
                     res.sendStatus(404);
                 }
                 else {
-                    res.send("Inserted successfully")
+                    res.status(201).send("Inserted successfully")
                 }
             })
         }
@@ -254,7 +282,7 @@ module.exports = {
                     res.sendStatus(err)
                 }
                 else {
-                    res.send("Deleted successfully")
+                    res.status(202).send("Deleted successfully")
                 }
             })
         }
