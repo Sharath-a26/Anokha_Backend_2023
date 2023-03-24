@@ -317,10 +317,11 @@ module.exports = {
     
             db.query(sql_q,(err,result) => {
                 if(err) {
-                    res.send(err);
+                    console.log("Error in query getCrewDetails");
+                    req.status(500).send({"error" : "error in db query... contact db admin"});
                 }
                 else {
-                    res.send(result)
+                    res.status(200).send(result);
                 }
             })
         }
