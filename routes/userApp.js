@@ -13,5 +13,6 @@ router.post('/insertStarrs',userController.insertStarredEvent);
 router.post('/dropStarrs',userController.dropStarredEvent);
 router.get('/getStarredEvents/:userEmail',userController.getStarredEvents);
 router.get('/getCrew',userController.getCrewDetails);
+router.get('/events/all', userController.getAllEvents);
 
 module.exports = router;

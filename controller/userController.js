@@ -392,7 +392,25 @@ module.exports = {
                 }
             })
         }
-    ]
+    ],
+
+    getAllEvents : [tokenValidator, (req, res) => {
+        db.query(`select * from EventData`, (err, result) => {
+            if(err)
+            {
+                    const now = new Date();
+                    now.setUTCHours(now.getUTCHours() + 5);
+                    now.setUTCMinutes(now.getUTCMinutes() + 30);
+                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                    req.status(500).send({"error" : "error in db query... contact db admin"});
+            }
+            else{
+                res.status(200).send(result);
+            }
+        })
+    }]
 
 
 

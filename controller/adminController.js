@@ -137,7 +137,7 @@ const fs = require('fs');
         })
     }],
 
-    updateEventData : (req, res) => {
+    updateEventData : [tokenValidator, (req, res) => {
         db.query(`update EventData set eventName = '${req.body.eventName}', description = '${req.body.description}', date = '${req.body.eventDate}', eventTime = '${req.body.eventTime}', venue = '${req.body.venue}', fees = ${req.body.fees}, totalNumberOfSeats = '${req.body.totalNumberOfSeats}', refundable = ${req.body.refundable}, departmentAbbr = '${req.body.departmentAbbr}' where eventId = ${req.body.eventId} and eventManagerEmail = '${req.body.eventManagerEmail}'`, (err, result) => {
             if(err)
             {
@@ -159,6 +159,6 @@ const fs = require('fs');
                     }
             }
         })
-    }
+    }]
 }
 
