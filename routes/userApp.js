@@ -8,9 +8,7 @@ router.get('/getUser/:userEmail',userController.getUserDetails);
 router.post('/login', userController.userLogin);
 router.post('/registerUser', userController.registerUser);
 router.post('/verifyOTP', userController.verifyOTP);
-
 router.post('/insertStarrs',userController.insertStarredEvent)
-
 router.post('/dropStarrs',userController.dropStarredEvent)
 router.get('/getStarrs/:userEmail',controller.getUserStarrs)
 module.exports = router;
