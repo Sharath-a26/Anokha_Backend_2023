@@ -252,37 +252,43 @@ module.exports = {
 
     }],
 
-    
+
 
     insertStarredEvent : [
-        tokenGenerator,(req,res) => {
-            const data = req.body;
+        tokenValidator,(req,res) => {
             let user_email = req.body.userEmail;
-            let event_name = req.body.eventName;
-            let sql_q = `insert into starredevents values ((select eventId from eventdata where eventName = '${event_name}'),'${user_email}')`
-    
-            db.query(sql_q,(err,result,fields) => {
+            let event_id = req.body.eventId;
+            let sql_q = `insert into starredevents values (${event_id},'${user_email}')`
+            db.query(sql_q,(err,result) => {
                 if(err) {
-                    res.sendStatus(404);
+                    console.log(err);
+                    res.status(400).send({"error" : "Error in data"});
                 }
                 else {
-                    res.status(201).send("Inserted successfully")
+                    res.status(201).send({result : "Inserted successfully"})
                 }
             })
         }
     ],
 
     dropStarredEvent : [
-        tokenGenerator,(req,res) => {
+        tokenValidator,(req,res) => {
             let user_email = req.body.userEmail;
-            let event_name = req.body.eventName;
-            let sql_q = `delete from starredevents where userEmail = '${user_email}' and eventId = (select eventId from eventData where eventName = '${event_name}')`;
-            db.query(sql_q,(err,result,fields) => {
+            let event_id = req.body.eventId;
+            let sql_q = `delete from starredevents where (userEmail = '${user_email}' and eventId = ${event_id})`;
+            db.query(sql_q,(err,result) => {
                 if(err) {
-                    res.sendStatus(err)
+                    res.status(400).send({"error" : "Error in data"})
                 }
                 else {
-                    res.status(202).send("Deleted successfully")
+                    
+                    if(result.affectedRows == 0)
+                    {
+                        res.status(400).send({"error" : "Error in data"});
+                    }
+                    else{
+                    res.status(202).send({result : "Deleted successfully"});
+                    }
                 }
             })
         }
