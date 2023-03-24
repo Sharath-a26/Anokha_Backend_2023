@@ -10,4 +10,5 @@ router.post('/registerUser', userController.registerUser);
 router.post('/verifyOTP', userController.verifyOTP);
 router.post('/insertStarrs',userController.insertStarredEvent)
 router.post('/dropStarrs',userController.dropStarredEvent)
+router.get('/getStarredEvents/:userEmail',userController.getStarredEvents)
 module.exports = router;

@@ -20,7 +20,15 @@ const tokenValidator = require('../middleware/tokenValidator');
 
 
      getEventDetails : [tokenValidator, (req, res) => {
-        let sql_q = `select * from EventData where eventManagerEmail = '${req.params.eventManagerEmail}'`;
+        var sql_q = "";
+        if(req.params.eventDate == undefined)
+        {
+            sql_q = `select * from EventData where eventManagerEmail = '${req.params.eventManagerEmail}'`;
+        }
+        else{
+            sql_q = `select * from EventData where eventManagerEmail = '${req.params.eventManagerEmail}' and date = '${req.params.eventDate}'`;
+        }
+       
         db.query(sql_q, (err, result) => {
             if(err)
             {
@@ -89,8 +97,8 @@ const tokenValidator = require('../middleware/tokenValidator');
     },
 
     registeredUsers : [tokenValidator, (req,res) => {
-        let sql = `select * from userData where userEmail in (select userEmail from registeredevents where eventId in 
-            (select eventId from eventData where eventName = '${req.params.eventName}'));`
+        let sql = `select * from userData where userEmail in (select userEmail from registeredevents where eventId = 
+            (select eventId from eventData where eventId = '${req.params.eventId}'));`
 
         db.query(sql,(err,result) => {
             if(err) {

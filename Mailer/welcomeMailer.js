@@ -1,4 +1,5 @@
 const mailer = require('nodemailer');
+const fs = require('fs');
 const welcomeMailer = () => {
   var transporter = mailer.createTransport({
     service: 'gmail',
@@ -8,7 +9,8 @@ const welcomeMailer = () => {
     }
 });
 
-   
+   const data = fs.readFileSync('../htmlDocuments/welcomeHTML.html');
+  console.log(data.toString());
     
     
     
@@ -16,7 +18,7 @@ const welcomeMailer = () => {
         from: 'kvaisakhkrishnan@gmail.com',
         to: 'cb.en.u4cse20069@cb.students.amrita.edu',
         subject: 'Welcome',
-        html: `<p></p>`
+        html: data.toString()
       }
     
     
@@ -29,5 +31,5 @@ const welcomeMailer = () => {
         }
       });
 }
-
+welcomeMailer();
 module.exports = welcomeMailer;
