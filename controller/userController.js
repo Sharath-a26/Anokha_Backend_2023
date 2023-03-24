@@ -6,12 +6,18 @@ const otpTokenValidator = require('../middleware/otpTokenValidator');
 const randonNumberGenerator = require('../OTPGenerator/otp');
 const mailer = require('../Mailer/otpGenerator');
 const welcomeMailer = require('../Mailer/welcomeMailer');
+const fs = require('fs');
 module.exports = {
     getEventsByDepartment : [tokenValidator, (req, res) => {
         let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
         db.query(sql_q, (err, result) => {
             if(err){
-                console.log("Error in query getEventsByDepartment");
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else{
@@ -52,7 +58,12 @@ module.exports = {
         db.query(
             sql_q,(err,result) => {
                 if(err){
-                    console.log("Error in query getUserDetails");
+                    const now = new Date();
+                    now.setUTCHours(now.getUTCHours() + 5);
+                    now.setUTCMinutes(now.getUTCMinutes() + 30);
+                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                     res.status(500).send({error : "Query Error... Contact DB Admin"});
                 }
                 else {
@@ -74,10 +85,25 @@ module.exports = {
 
     editUserDetails: [tokenValidator, (req,res) => {
         const data = req.body;
-        let sql = `Update userData SET fullName = '${req.body.fullName}',password = '${req.body.password}',currentStatus = '${req.body.currentStatus}',activePassport = '${req.body.activePassport}',isAmritaCBE = '${req.body.isAmritaCBE}',collegeId = '${req.body.collegeId}' where userEmail = '${req.body.userEmail}'`
+        if(req.body.fullName == undefined || 
+            req.body.password == undefined ||
+            req.body.collegeId == undefined || 
+            req.body.userEmail == undefined
+            )
+            {
+                res.status(400).send({error : "you need to much better to do so..."});
+            }
+            else{
+
+        let sql = `Update userData SET fullName = '${req.body.fullName}',password = '${req.body.password}', collegeId = '${req.body.collegeId}' where userEmail = '${req.body.userEmail}'`
         db.query(sql,(err,result,fields) => {
             if(err) {
-                console.log("Error in query editUserDetails");
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else {
@@ -85,6 +111,7 @@ module.exports = {
                 
             }
         })
+    }
     }]
 ,
 
@@ -94,8 +121,12 @@ module.exports = {
         let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = '${req.body.userEmail}' and password = '${req.body.password}'`
         db.query(sql_q, async (err, result) => {
             if(err){
-                console.log(err)
-                console.log("Error in query userLogin");
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
 
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
@@ -149,7 +180,12 @@ module.exports = {
                 db.query(`select * from UserData where userEmail = '${req.body.userEmail}'`, (err, result) =>{
                     if(err)
                     {
-                        console.log("Error in query registerUser");
+                        const now = new Date();
+                        now.setUTCHours(now.getUTCHours() + 5);
+                         now.setUTCMinutes(now.getUTCMinutes() + 30);
+                         const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                        fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                        fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                         res.status(500).send({error : "Query Error... Contact DB Admin"});
                     }
                     else{
@@ -194,7 +230,12 @@ module.exports = {
                                 if(err)
                                 {
                                     
-                                    console.log("Error in query userRegister");
+                                    const now = new Date();
+                                    now.setUTCHours(now.getUTCHours() + 5);
+                                    now.setUTCMinutes(now.getUTCMinutes() + 30);
+                                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                                     res.status(500).send({error : "Query Error... Contact DB Admin"});
                                 }
                                 else{
@@ -229,7 +270,12 @@ module.exports = {
         db.query(`select * from  OTP where userEmail = '${userEmail}' and otp = ${otp}`, (err, result) => {
             if(err)
             {
-                console.log("Error in query userRegister");
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else{
@@ -263,7 +309,12 @@ module.exports = {
             let sql_q = `insert into starredevents values (${event_id},'${user_email}')`
             db.query(sql_q,(err,result) => {
                 if(err) {
-                    console.log(err);
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                     res.status(400).send({"error" : "Error in data"});
                 }
                 else {
@@ -280,6 +331,12 @@ module.exports = {
             let sql_q = `delete from starredevents where (userEmail = '${user_email}' and eventId = ${event_id})`;
             db.query(sql_q,(err,result) => {
                 if(err) {
+                    const now = new Date();
+                    now.setUTCHours(now.getUTCHours() + 5);
+                    now.setUTCMinutes(now.getUTCMinutes() + 30);
+                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                     res.status(400).send({"error" : "Error in data"})
                 }
                 else {
@@ -300,7 +357,12 @@ module.exports = {
         db.query(`select * from starredevents LEFT JOIN  eventdata ON starredevents.eventId = eventdata.eventId where userEmail = '${req.params.userEmail}'`, (err, result) =>  {
             if(err)
             {
-                console.log("Error in query getStarredEvents");
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                 req.status(500).send({"error" : "error in db query... contact db admin"});
             }
             else{
@@ -317,7 +379,12 @@ module.exports = {
     
             db.query(sql_q,(err,result) => {
                 if(err) {
-                    console.log("Error in query getCrewDetails");
+                    const now = new Date();
+                    now.setUTCHours(now.getUTCHours() + 5);
+                    now.setUTCMinutes(now.getUTCMinutes() + 30);
+                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                     req.status(500).send({"error" : "error in db query... contact db admin"});
                 }
                 else {

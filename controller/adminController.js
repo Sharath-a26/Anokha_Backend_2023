@@ -1,6 +1,7 @@
 const { db, transactions_db } = require('../connection');
 const tokenGenerator = require('../middleware/tokenGenerator');
 const tokenValidator = require('../middleware/tokenValidator');
+const fs = require('fs');
 
  module.exports = {
 
@@ -8,7 +9,12 @@ const tokenValidator = require('../middleware/tokenValidator');
          let sql_q = `select * from eventManager where eventManagerEmail = '${req.params.adminEmail}'`;
          db.query(sql_q,(err,result) => {
              if(err) {
-                console.log("Error in query getAdminDetails");
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             
              }
@@ -32,7 +38,12 @@ const tokenValidator = require('../middleware/tokenValidator');
         db.query(sql_q, (err, result) => {
             if(err)
             {
-                console.log("Error in query getEventDetails");
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else{
@@ -52,8 +63,13 @@ const tokenValidator = require('../middleware/tokenValidator');
                 }
                 else{
                
-                console.log("Error in query getEventDetails");
-                res.status(500).send({error : "Query Error... Contact DB Admin"});
+                    const now = new Date();
+                    now.setUTCHours(now.getUTCHours() + 5);
+                    now.setUTCMinutes(now.getUTCMinutes() + 30);
+                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                    res.status(500).send({error : "Query Error... Contact DB Admin"});
                 }
             }
             else{
@@ -67,7 +83,12 @@ const tokenValidator = require('../middleware/tokenValidator');
         let sql_q = `select * from EventManager where eventManagerEmail = '${req.body.eventManagerEmail}' and password = '${req.body.password}'`
         db.query(sql_q, async (err, result) => {
             if(err){
-                console.log("Error in query userLogin");
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else
@@ -102,12 +123,42 @@ const tokenValidator = require('../middleware/tokenValidator');
 
         db.query(sql,(err,result) => {
             if(err) {
-                res.send("Query Error")
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                res.status(500).send({error : "Query Error"})
             }
             else {
                  res.send(result)
             }
         })
-    }]
+    }],
+
+    updateEventData : (req, res) => {
+        db.query(`update EventData set eventName = '${req.body.eventName}', description = '${req.body.description}', date = '${req.body.eventDate}', eventTime = '${req.body.eventTime}', venue = '${req.body.venue}', fees = ${req.body.fees}, totalNumberOfSeats = '${req.body.totalNumberOfSeats}', refundable = ${req.body.refundable}, departmentAbbr = '${req.body.departmentAbbr}' where eventId = ${req.body.eventId} and eventManagerEmail = '${req.body.eventManagerEmail}'`, (err, result) => {
+            if(err)
+            {
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                res.status(500).send({error : "Query Error"})
+            }
+            else{
+                if(result.affectedRows == 0)
+                    {
+                        res.status(400).send({"error" : "Error in data"});
+                    }
+                    else{
+                    res.status(200).send({result : "Updated Succesfully"});
+                    }
+            }
+        })
+    }
 }
 
