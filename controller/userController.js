@@ -196,7 +196,7 @@ module.exports = {
     }],
 
     insertStarredEvent : [
-        tokenGenerator,(req,res) => {
+        tokenValidator,(req,res) => {
             const data = req.body;
             let user_email = req.body.userEmail;
             let event_name = req.body.eventName;
@@ -214,7 +214,7 @@ module.exports = {
     ],
 
     dropStarredEvent : [
-        tokenGenerator,(req,res) => {
+        tokenValidator,(req,res) => {
             let user_email = req.body.userEmail;
             let event_name = req.body.eventName;
             let sql_q = `delete from starredevents where userEmail = '${user_email}' and eventId = (select eventId from eventData where eventName = '${event_name}')`;
@@ -224,6 +224,22 @@ module.exports = {
                 }
                 else {
                     res.send("Deleted successfully")
+                }
+            })
+        }
+    ],
+
+    getUserStarrs : [
+        tokenValidator,(req,res) => {
+            
+            let sql_q = `select * from eventData where eventId in (select eventId from starredEvents where userEmail = '${req.params.userEmail}')`
+            db.query(sql_q,(err,result) => {
+                if(err) {
+                    console.log(err);
+                    res.sendStatus(404).send({"error":"Send valid email"})
+                }
+                else {
+                    res.send(result)
                 }
             })
         }
