@@ -1,4 +1,6 @@
 const express = require('express')
+
+const helmet = require('helmet')
 require('dotenv').config()
 const createTables = require('./Relations/createRelations');
 const dropTables = require('./Relations/dropRelations');
@@ -9,13 +11,14 @@ const { pid } = require('process');
 const numCPUs = require('os').cpus().length;
 const {db, transactions_db} = require('./connection');
 const insertDummyData = require('./SampleData/dummyData');
-const server = express();
+const server = express()
+
 const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
 const keyGenerator = require('./AssymetricKeyPair/key');
 
 
-    
+server.use(helmet())
 const initialize = () => {
     //Drop command. Please be carefull!!
     dropTables(db);
