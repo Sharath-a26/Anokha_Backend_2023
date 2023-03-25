@@ -1,5 +1,4 @@
 const express = require('express')
-
 const helmet = require('helmet')
 require('dotenv').config()
 const createTables = require('./Relations/createRelations');
@@ -17,8 +16,6 @@ const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
 const keyGenerator = require('./AssymetricKeyPair/key');
 
-
-server.use(helmet())
 const initialize = () => {
     //Drop command. Please be carefull!!
     dropTables(db);
@@ -36,7 +33,7 @@ const initialize = () => {
 
     //Please be careful. Dont run this command if you have data in backend.
     //initialize();
-    
+    server.use(helmet())
     server.use(express.json());
     
      //Routes

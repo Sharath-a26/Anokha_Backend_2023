@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/kvaisakhkrishnan/Anokha_Backend_2023#readme",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "crypto": "^1.0.1",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.9",
