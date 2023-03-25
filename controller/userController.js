@@ -10,8 +10,10 @@ const fs = require('fs');
 module.exports = {
     getEventsByDepartment : [tokenValidator, (req, res) => {
         let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
+       db.beginTransaction()
         db.query(sql_q, (err, result) => {
             if(err){
+                db.rollback()
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
@@ -22,7 +24,7 @@ module.exports = {
             }
             else{
 
-
+                db.commit()
                 var jsonResponse = [];
                 var eventsByDepartment = {};
                 var department = "";
@@ -55,9 +57,11 @@ module.exports = {
     getUserDetails : [tokenValidator, (req,res) => {
         
         let sql_q = `select * from UserData where userEmail = ?`;
+        db.beginTransaction()
         db.query(
             sql_q,[req.params.userEmail],(err,result) => {
                 if(err){
+                    db.rollback()
                     const now = new Date();
                     now.setUTCHours(now.getUTCHours() + 5);
                     now.setUTCMinutes(now.getUTCMinutes() + 30);
@@ -67,6 +71,7 @@ module.exports = {
                     res.status(500).send({error : "Query Error... Contact DB Admin"});
                 }
                 else {
+                    db.commit()
 
                     if(result.length == 0)
                     {
@@ -94,10 +99,11 @@ module.exports = {
                 res.status(400).send({error : "you need to much better to do so..."});
             }
             else{
-
+        db.beginTransaction()
         let sql = `Update userData SET fullName = ?,password = ?, collegeId = ? where userEmail = ?`
         db.query(sql,[req.body.fullName,req.body.password,req.body.collegeId,req.body.userEmail],(err,result,fields) => {
             if(err) {
+                db.rollback()
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
@@ -107,6 +113,7 @@ module.exports = {
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
             }
             else {
+                db.commit()
                 res.status(200).send({result : "Updated Successfully"})
                 
             }
@@ -119,8 +126,10 @@ module.exports = {
         console.log(req.body.userEmail);
         console.log(req.body.password);
         let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = ? and password = ?`
+        db.beginTransaction()
         db.query(sql_q,[req.body.userEmail,req.body.password], async (err, result) => {
             if(err){
+                db.rollback()
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
@@ -132,6 +141,7 @@ module.exports = {
             }
             else
             {
+                db.commit()
                 if(result.length == 0)
                 {
                     res.status(404).send({error : "User not found"})
@@ -176,10 +186,12 @@ module.exports = {
             }
 
             else{
+                db.beginTransaction()
 
                 db.query(`select * from UserData where userEmail = ?`,[req.body.userEmail], (err, result) =>{
                     if(err)
                     {
+                        db.rollback()
                         const now = new Date();
                         now.setUTCHours(now.getUTCHours() + 5);
                          now.setUTCMinutes(now.getUTCMinutes() + 30);
@@ -189,6 +201,7 @@ module.exports = {
                         res.status(500).send({error : "Query Error... Contact DB Admin"});
                     }
                     else{
+                        db.commit()
                         if(result.length != 0)
                         {
                             res.status(409).send({"error" : "user already exists..."});
@@ -225,10 +238,13 @@ module.exports = {
                             now.setUTCHours(now.getUTCHours() + 5);
                             now.setUTCMinutes(now.getUTCMinutes() + 30);
                             const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+
+                            db.beginTransaction()
                             db.query(`delete from OTP where userEmail = ?`,[req.body.userEmail], (err, res) => {});
                             db.query(`insert into OTP (userEmail, otp, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,[req.body.userEmail,otpGenerated,req.body.fullName,req.body.password,req.body.currentStatus,0,req.body.isAmritaCBE,req.body.collegeId,istTime,null,null], async (err, result)=> {
                                 if(err)
                                 {
+                                    db.rollback()
                                     
                                     const now = new Date();
                                     now.setUTCHours(now.getUTCHours() + 5);
@@ -239,6 +255,7 @@ module.exports = {
                                     res.status(500).send({error : "Query Error... Contact DB Admin"});
                                 }
                                 else{
+                                    db.commit()
                                     const token = await otpTokenGenerator({
                                         userEmail : req.body.userEmail,
                                         password : req.body.password
