@@ -11,10 +11,10 @@ const fs = require('fs');
 module.exports = {
     getEventsByDepartment : [tokenValidator, (req, res) => {
         let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
-       db.beginTransaction()
+
         db.query(sql_q, (err, result) => {
             if(err){
-                db.rollback()
+
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
@@ -25,7 +25,7 @@ module.exports = {
             }
             else{
 
-                db.commit()
+
                 var jsonResponse = [];
                 var eventsByDepartment = {};
                 var department = "";

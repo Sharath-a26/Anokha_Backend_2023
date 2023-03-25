@@ -7,7 +7,6 @@ const createTransactionTable = require('./Relations/createTransactionsTable')
 const dropTransactionTable = require('./Relations/dropTransactionsTable')
 const cluster = require('cluster');
 const { pid } = require('process');
-const numCPUs = require('os').cpus().length;
 const {db, transactions_db} = require('./connection');
 const insertDummyData = require('./SampleData/dummyData');
 const server = express()
