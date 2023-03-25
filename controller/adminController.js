@@ -227,7 +227,7 @@ const fs = require('fs');
                     }
             }
         })
-    }
     }]
+    
 }
 
