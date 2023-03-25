@@ -54,9 +54,9 @@ module.exports = {
 
     getUserDetails : [tokenValidator, (req,res) => {
         
-        let sql_q = `select * from UserData where userEmail = '${req.params.userEmail}'`;
+        let sql_q = `select * from UserData where userEmail = ?`;
         db.query(
-            sql_q,(err,result) => {
+            sql_q,[req.params.userEmail],(err,result) => {
                 if(err){
                     const now = new Date();
                     now.setUTCHours(now.getUTCHours() + 5);
@@ -95,8 +95,8 @@ module.exports = {
             }
             else{
 
-        let sql = `Update userData SET fullName = '${req.body.fullName}',password = '${req.body.password}', collegeId = '${req.body.collegeId}' where userEmail = '${req.body.userEmail}'`
-        db.query(sql,(err,result,fields) => {
+        let sql = `Update userData SET fullName = ?,password = ?, collegeId = ? where userEmail = ?`
+        db.query(sql,[req.body.fullName,req.body.password,req.body.collegeId,req.body.userEmail],(err,result,fields) => {
             if(err) {
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
@@ -118,8 +118,8 @@ module.exports = {
     userLogin : (req, res) => {
         console.log(req.body.userEmail);
         console.log(req.body.password);
-        let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = '${req.body.userEmail}' and password = '${req.body.password}'`
-        db.query(sql_q, async (err, result) => {
+        let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = ? and password = ?`
+        db.query(sql_q,[req.body.userEmail,req.body.password], async (err, result) => {
             if(err){
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
@@ -177,7 +177,7 @@ module.exports = {
 
             else{
 
-                db.query(`select * from UserData where userEmail = '${req.body.userEmail}'`, (err, result) =>{
+                db.query(`select * from UserData where userEmail = ?`,[req.body.userEmail], (err, result) =>{
                     if(err)
                     {
                         const now = new Date();
@@ -225,8 +225,8 @@ module.exports = {
                             now.setUTCHours(now.getUTCHours() + 5);
                             now.setUTCMinutes(now.getUTCMinutes() + 30);
                             const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                            db.query(`delete from OTP where userEmail = '${req.body.userEmail}'`, (err, res) => {});
-                            db.query(`insert into OTP (userEmail, otp, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values ('${req.body.userEmail}', ${otpGenerated}, '${req.body.fullName}', '${req.body.password}', ${req.body.currentStatus}, ${0}, ${req.body.isAmritaCBE}, ${req.body.collegeId}, '${istTime}', ${null}, ${null})`, async (err, result)=> {
+                            db.query(`delete from OTP where userEmail = ?`,[req.body.userEmail], (err, res) => {});
+                            db.query(`insert into OTP (userEmail, otp, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,[req.body.userEmail,otpGenerated,req.body.fullName,req.body.password,req.body.currentStatus,0,req.body.isAmritaCBE,req.body.collegeId,istTime,null,null], async (err, result)=> {
                                 if(err)
                                 {
                                     
@@ -267,7 +267,7 @@ module.exports = {
         const otp = req.body.otp;
         const userEmail = req.body.userEmail;
 
-        db.query(`select * from  OTP where userEmail = '${userEmail}' and otp = ${otp}`, (err, result) => {
+        db.query(`select * from  OTP where userEmail = ? and otp = ?`,[userEmail,otp], (err, result) => {
             if(err)
             {
                 const now = new Date();
@@ -286,8 +286,8 @@ module.exports = {
                     now.setUTCHours(now.getUTCHours() + 5);
                     now.setUTCMinutes(now.getUTCMinutes() + 30);
                     const istTime = now.toISOString().slice(0, 19).replace('T', ' ');   
-                    db.query(`insert into UserData (userEmail, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values ('${result[0].userEmail}', '${result[0].fullName}', '${result[0].password}', ${result[0].currentStatus}, ${0}, ${result[0].isAmritaCBE}, ${result[0].collegeId}, '${istTime}', ${null}, ${null})`, (err2, result2) => {});
-                    db.query(`delete from OTP where userEmail = '${userEmail}'`, (err, result3) => {});
+                    db.query(`insert into UserData (userEmail, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,[result[0].userEmail,result[0].fullName,result[0].password,result[0].currentStatus,0,result[0].isAmritaCBE,result[0].collegeId,istTime,null,null], (err2, result2) => {});
+                    db.query(`delete from OTP where userEmail = ?`,[userEmail], (err, result3) => {});
                     welcomeMailer(result[0].fullName, userEmail);
                     res.status(200).send({"result" : "success"})
                 }
@@ -306,8 +306,8 @@ module.exports = {
             const data = req.body;
             let user_email = req.body.userEmail;
             let event_id = req.body.eventId;
-            let sql_q = `insert into starredevents values (${event_id},'${user_email}')`
-            db.query(sql_q,(err,result) => {
+            let sql_q = `insert into starredevents values (?,?)`
+            db.query(sql_q,[event_id,user_email],(err,result) => {
                 if(err) {
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
@@ -328,8 +328,8 @@ module.exports = {
         tokenValidator,(req,res) => {
             let user_email = req.body.userEmail;
             let event_id = req.body.eventId;
-            let sql_q = `delete from starredevents where (userEmail = '${user_email}' and eventId = ${event_id})`;
-            db.query(sql_q,(err,result) => {
+            let sql_q = `delete from starredevents where (userEmail = ? and eventId = ?)`;
+            db.query(sql_q,[user_email,event_id],(err,result) => {
                 if(err) {
                     const now = new Date();
                     now.setUTCHours(now.getUTCHours() + 5);
@@ -354,7 +354,7 @@ module.exports = {
     ],
 
     getStarredEvents : [tokenValidator, (req, res) => {
-        db.query(`select * from starredevents LEFT JOIN  eventdata ON starredevents.eventId = eventdata.eventId where userEmail = '${req.params.userEmail}'`, (err, result) =>  {
+        db.query(`select * from starredevents LEFT JOIN  eventdata ON starredevents.eventId = eventdata.eventId where userEmail = ?`,[req.params.userEmail], (err, result) =>  {
             if(err)
             {
                 const now = new Date();

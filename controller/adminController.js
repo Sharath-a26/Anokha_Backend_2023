@@ -6,8 +6,8 @@ const fs = require('fs');
  module.exports = {
 
      getAdminDetails : [tokenValidator, (req,res) => {
-         let sql_q = `select * from eventManager where eventManagerEmail = '${req.params.adminEmail}'`;
-         db.query(sql_q,(err,result) => {
+         let sql_q = `select * from eventManager where eventManagerEmail = ?`;
+         db.query(sql_q,[req.params.adminEmail],(err,result) => {
              if(err) {
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
@@ -27,15 +27,18 @@ const fs = require('fs');
 
      getEventDetails : [tokenValidator, (req, res) => {
         var sql_q = "";
+        var params = []
         if(req.params.eventDate == undefined)
         {
-            sql_q = `select * from EventData where eventManagerEmail = '${req.params.eventManagerEmail}'`;
+            sql_q = `select * from EventData where eventManagerEmail = ?`;
+            params = [req.params.eventManagerEmail]
         }
         else{
-            sql_q = `select * from EventData where eventManagerEmail = '${req.params.eventManagerEmail}' and date = '${req.params.eventDate}'`;
+            sql_q = `select * from EventData where eventManagerEmail = ? and date = ?`;
+            params = [req.params.eventManagerEmail,req.params.eventDate]
         }
        
-        db.query(sql_q, (err, result) => {
+        db.query(sql_q,params, (err, result) => {
             if(err)
             {
                 const now = new Date();
@@ -53,8 +56,8 @@ const fs = require('fs');
      }],
 
      createEvent : [tokenValidator,  (req, res) => {
-        let sql_q = `insert into EventData (eventName, eventOrWorkshop, description, eventManagerEmail, date, eventTime, venue, fees, totalNumberOfSeats, noOfRegistrations, timeStamp, refundable, departmentAbbr) values ('${req.body.eventName}', ${req.body.eventOrWorkshop}, '${req.body.description}', '${req.body.eventManagerEmail}', '${req.body.date}', '${req.body.eventTime}', '${req.body.venue}', ${req.body.fees}, ${req.body.totalNumberOfSeats}, ${req.body.noOfRegistrations}, '${req.body.timeStamp}', ${req.body.refundable}, '${req.body.departmentAbbr}')`;
-        db.query(sql_q, (err, result) => {
+        let sql_q = `insert into EventData (eventName, eventOrWorkshop, description, eventManagerEmail, date, eventTime, venue, fees, totalNumberOfSeats, noOfRegistrations, timeStamp, refundable, departmentAbbr) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        db.query(sql_q, [req.body.eventName,req.body.eventOrWorkshop,req.body.description,req.body.eventManagerEmail,req.body.date,req.body.eventTime,req.body.venue,req.body.fees,req.body.totalNumberOfSeats,req.body.noOfRegistrations,req.body.timeStamp,req.body.refundable,req.body.departmentAbbr],(err, result) => {
             if(err)
             {
                 if(err.errno = 1452)
@@ -80,8 +83,8 @@ const fs = require('fs');
      }],
 
      adminLogin :  (req, res) => {
-        let sql_q = `select * from EventManager where eventManagerEmail = '${req.body.eventManagerEmail}' and password = '${req.body.password}'`
-        db.query(sql_q, async (err, result) => {
+        let sql_q = `select * from EventManager where eventManagerEmail = ? and password = ?`
+        db.query(sql_q, [req.body.eventManagerEmail,req.body.password],async (err, result) => {
             if(err){
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
@@ -119,9 +122,9 @@ const fs = require('fs');
 
     registeredUsers : [tokenValidator, (req,res) => {
         let sql = `select * from userData where userEmail in (select userEmail from registeredevents where eventId = 
-            (select eventId from eventData where eventId = '${req.params.eventId}'));`
+            (select eventId from eventData where eventId = ?));`
 
-        db.query(sql,(err,result) => {
+        db.query(sql,[req.params.eventId],(err,result) => {
             if(err) {
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
@@ -138,7 +141,8 @@ const fs = require('fs');
     }],
 
     updateEventData : [tokenValidator, (req, res) => {
-        db.query(`update EventData set eventName = '${req.body.eventName}', description = '${req.body.description}', date = '${req.body.eventDate}', eventTime = '${req.body.eventTime}', venue = '${req.body.venue}', fees = ${req.body.fees}, totalNumberOfSeats = '${req.body.totalNumberOfSeats}', refundable = ${req.body.refundable}, departmentAbbr = '${req.body.departmentAbbr}' where eventId = ${req.body.eventId} and eventManagerEmail = '${req.body.eventManagerEmail}'`, (err, result) => {
+        db.query(`update EventData set eventName = ?, description = ?, date = ?, eventTime = ?, venue = ?, fees = ?, totalNumberOfSeats = ?, refundable = ?, departmentAbbr = ? where eventId = ? and eventManagerEmail = ?`,
+        [req.body.eventName,req.body.description,req.body.eventDate,req.body.eventTime,req.body.venue,req.body.fees,req.body.totalNumberOfSeats,req.body.refundable,req.body.departmentAbbr,req.body.eventId,req.body.eventManagerEmail], (err, result) => {
             if(err)
             {
                 const now = new Date();
