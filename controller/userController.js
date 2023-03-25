@@ -6,6 +6,7 @@ const otpTokenValidator = require('../middleware/otpTokenValidator');
 const randonNumberGenerator = require('../OTPGenerator/otp');
 const mailer = require('../Mailer/otpGenerator');
 const welcomeMailer = require('../Mailer/welcomeMailer');
+const validator = require('validator');
 const fs = require('fs');
 module.exports = {
     getEventsByDepartment : [tokenValidator, (req, res) => {
@@ -55,7 +56,10 @@ module.exports = {
     }],
 
     getUserDetails : [tokenValidator, (req,res) => {
-        
+
+        if(validator.isEmail(req.params.userEmail))
+        {
+
         let sql_q = `select * from UserData where userEmail = ?`;
         db.beginTransaction()
         db.query(
@@ -85,15 +89,20 @@ module.exports = {
                 }
             }
         )
+        }
+        else{
+            res.status(400).send({error : "you need to much better to do so..."})
+        }
         
     }],
 
     editUserDetails: [tokenValidator, (req,res) => {
         const data = req.body;
-        if(req.body.fullName == undefined || 
-            req.body.password == undefined ||
-            req.body.collegeId == undefined || 
-            req.body.userEmail == undefined
+        if(validator.isEmpty(req.body.fullName) ||
+            validator.isEmpty(req.body.password) ||
+            validator.isEmpty(req.body.collegeId) ||
+            validator.isEmpty(req.body.userEmail) ||
+            !validator.isEmail(req.body.userEmail)
             )
             {
                 res.status(400).send({error : "you need to much better to do so..."});
@@ -123,8 +132,7 @@ module.exports = {
 ,
 
     userLogin : (req, res) => {
-        console.log(req.body.userEmail);
-        console.log(req.body.password);
+        if(!validator.isEmpty(req.body.userEmail) || !validator.isEmpty(req.body.password) || validator.isEmail(req.body.userEmail)){
         let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = ? and password = ?`
         db.beginTransaction()
         db.query(sql_q,[req.body.userEmail,req.body.password], async (err, result) => {
@@ -169,18 +177,23 @@ module.exports = {
                 }
             }
         })
+        }
+        else{
+            res.status(400).send({error : "you need to much better to do so..."});
+        }
     },
     
 
     registerUser :(req, res) =>{
 
 
-        if(req.body.userEmail == undefined ||
-            req.body.fullName == undefined ||
-            req.body.password == undefined ||
-            req.body.currentStatus == undefined ||
-            req.body.isAmritaCBE == undefined ||
-            req.body.collegeId == undefined)
+        if(validator.isEmpty(req.body.userEmail)||
+            validator.isEmpty(req.body.fullName)||
+            validator.isEmpty(req.body.password)||
+            validator.isEmpty(req.body.collegeId) ||
+            !validator.isEmail(req.body.userEmail) ||
+            !validator.isBoolean(req.body.collegeId))
+            
             {
                 res.status(400).send({"error" : "You need to be much better to do so..."});
             }
@@ -231,8 +244,11 @@ module.exports = {
                                 //Need tp verify credibility of email given
                                 
                             }
-                    
-                            
+                            var isAmrita = 0;
+                            if(req.body.collegeId == 1)
+                            {
+                                isAmrita = 1;
+                            }
                             const otpGenerated = randonNumberGenerator();
                             const now = new Date();
                             now.setUTCHours(now.getUTCHours() + 5);
@@ -241,7 +257,7 @@ module.exports = {
 
                             db.beginTransaction()
                             db.query(`delete from OTP where userEmail = ?`,[req.body.userEmail], (err, res) => {});
-                            db.query(`insert into OTP (userEmail, otp, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,[req.body.userEmail,otpGenerated,req.body.fullName,req.body.password,req.body.currentStatus,0,req.body.isAmritaCBE,req.body.collegeId,istTime,null,null], async (err, result)=> {
+                            db.query(`insert into OTP (userEmail, otp, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,[req.body.userEmail,otpGenerated,req.body.fullName,req.body.password,req.body.currentStatus,0,isAmrita,req.body.collegeId,istTime,null,null], async (err, result)=> {
                                 if(err)
                                 {
                                     db.rollback()
@@ -281,6 +297,15 @@ module.exports = {
 
 
     verifyOTP :[otpTokenValidator, (req, res) => {
+
+
+        if(validator.isEmpty(req.body.userEmail) ||
+        !validator.isEmail(req.body.userEmail) ||
+        !validator.isNumeric(req.body.otp))
+        {
+            res.status(400).send({"error" : "You need to be much better to do so..."});
+        }
+        else{
         const otp = req.body.otp;
         const userEmail = req.body.userEmail;
 
@@ -313,6 +338,7 @@ module.exports = {
                 }
             }
         })
+    }
 
     }],
 
@@ -320,7 +346,15 @@ module.exports = {
 
     insertStarredEvent : [
         tokenGenerator,(req,res) => {
-            const data = req.body;
+
+            if(!validator.isEmail(req.body.userEmail)
+            ||
+            !validator.isNumeric(req.body.eventId))
+            {
+                res.status(400).send({"error" : "You need to be much better to do so..."});
+            }
+            else{
+
             let user_email = req.body.userEmail;
             let event_id = req.body.eventId;
             let sql_q = `insert into starredevents values (?,?)`
@@ -339,10 +373,19 @@ module.exports = {
                 }
             })
         }
+        }
     ],
 
     dropStarredEvent : [
         tokenValidator,(req,res) => {
+
+            if(!validator.isEmail(req.body.userEmail) ||
+            !validator.isNumeric(req.body.eventId))
+            {
+                res.status(400).send({"error" : "You need to be much better to do so..."});
+            }
+            else{
+
             let user_email = req.body.userEmail;
             let event_id = req.body.eventId;
             let sql_q = `delete from starredevents where (userEmail = ? and eventId = ?)`;
@@ -368,9 +411,20 @@ module.exports = {
                 }
             })
         }
+        }
     ],
 
+
+
     getStarredEvents : [tokenValidator, (req, res) => {
+
+        if(!validator.isEmail(req.params.userEmail))
+        {
+            res.status(400).send({"error" : "You need to be much better to do so..."});
+
+        }
+        else{
+
         db.query(`select * from starredevents LEFT JOIN  eventdata ON starredevents.eventId = eventdata.eventId where userEmail = ?`,[req.params.userEmail], (err, result) =>  {
             if(err)
             {
@@ -386,12 +440,11 @@ module.exports = {
                 res.status(200).send(result);
             }
         })
+    }
     }],
 
     getCrewDetails : [
         tokenValidator,(req,res) => {
-            let team_name = req.params.teamName;
-            console.log(req.params.teamName);
             let sql_q = `select crewEmail,name,departmentAbbr,role,crewmembers.teamId from crewmembers left join crewdetails on crewmembers.teamId = crewdetails.teamId`;
     
             db.query(sql_q,(err,result) => {
