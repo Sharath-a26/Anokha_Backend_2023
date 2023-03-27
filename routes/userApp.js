@@ -13,5 +13,8 @@ router.post('/dropStarrs',userController.dropStarredEvent);
 router.get('/getStarredEvents/:userEmail',userController.getStarredEvents);
 router.get('/getCrew',userController.getCrewDetails);
 router.get('/events/all', userController.getAllEvents);
+router.post('/transaction/moveToTransaction', userController.moveToTransaction);
+router.post('/transaction/initiateTransaction', userController.initiateTransaction);
+
 
 module.exports = router;

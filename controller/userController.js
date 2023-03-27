@@ -8,6 +8,8 @@ const mailer = require('../Mailer/otpGenerator');
 const welcomeMailer = require('../Mailer/welcomeMailer');
 const validator = require('validator');
 const fs = require('fs');
+const transactionTokenGenerator = require('../middleware/transactionTokenGenerator');
+const transactionTokenVerifier = require('../middleware/transactionTokenVerifier');
 module.exports = {
     getEventsByDepartment : [tokenValidator, (req, res) => {
         let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
@@ -134,10 +136,8 @@ module.exports = {
     userLogin : (req, res) => {
         if(!validator.isEmpty(req.body.userEmail) || !validator.isEmpty(req.body.password) || validator.isEmail(req.body.userEmail)){
         let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = ? and password = ?`
-        db.beginTransaction()
         db.query(sql_q,[req.body.userEmail,req.body.password], async (err, result) => {
             if(err){
-                db.rollback()
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
@@ -149,7 +149,6 @@ module.exports = {
             }
             else
             {
-                db.commit()
                 if(result.length == 0)
                 {
                     res.status(404).send({error : "User not found"})
@@ -480,6 +479,69 @@ module.exports = {
                 res.status(200).send(result);
             }
         })
+    }],
+
+    moveToTransaction : async (req, res) => {
+        const tokenHeader = req.headers.authorization;
+        const token = tokenHeader && tokenHeader.split(' ')[1];
+        if(token == null)
+        {
+            res.status(400).send({"error" : "You need to be much better to do so..."});
+            return;
+        }
+        const transactionToken = await transactionTokenGenerator({
+            SECRET_TOKEN : token
+        });
+        if(transactionToken == null)
+        {
+            res.status(400).send({"error" : "Invalid Token"});
+            return;
+        }
+        res.status(200).send({"TRANSACTION_SECRET_TOKEN" : transactionToken});
+    },
+
+    initiateTransaction : [transactionTokenVerifier, (req, res) => {
+        if(
+            validator.isEmpty(req.body.transactionId) ||
+            !validator.isEmail(req.body.userEmail) ||
+            req.body.userEmail == undefined||
+            validator.isEmpty(req.body.transactionId) ||
+            req.body.transactionId == undefined ||
+            validator.isEmpty(req.body.sender) ||
+            req.body.sender == undefined ||
+            validator.isEmpty(req.body.senderAccNo) ||
+            req.body.senderAccNo == undefined ||
+            validator.isEmpty(req.body.receiver) ||
+            req.body.receiver == undefined ||
+            validator.isEmpty(req.body.receiverAccNo) ||
+            req.body.receiverAccNo == undefined ||
+            validator.isEmpty(req.body.eventIdOrPassportId) ||
+            req.body.eventIdOrPassportId == undefined ||
+            validator.isEmpty(req.body.amount) ||
+            req.body.amount == undefined
+        )
+        {
+            res.status(400).send({"error" : "Better luck next time..."});
+            return;
+        }
+        else{
+            const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            transactions_db.query(`insert into transactions (transactionId, userEmail, sender, senderAccNo, receiver, receiverAccNo, eventIdOrPassportId, amount, timeStamp, transactionStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.transactionId, req.body.userEmail, req.body.sender, req.body.senderAccNo, req.body.receiver, req.body.receiverAccNo, req.body.eventIdOrPassportId, req.body.amount, istTime, 0], (er, result) => {
+            if(err)
+            {
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                req.status(500).send({"error" : "error in db query... contact db admin"});
+            }
+        })
+    }
     }]
 
 

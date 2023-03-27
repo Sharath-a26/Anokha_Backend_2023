@@ -2,6 +2,7 @@ const { db, transactions_db } = require('../connection');
 const tokenGenerator = require('../middleware/tokenGenerator');
 const tokenValidator = require('../middleware/tokenValidator');
 const fs = require('fs');
+const validator = require('validator');
 
  module.exports = {
 
@@ -12,11 +13,8 @@ const fs = require('fs');
         }
         else{
          let sql_q = `select * from eventManager where eventManagerEmail = ?`;
-         db.beginTransaction()
          db.query(sql_q,[req.params.adminEmail],(err,result) => {
              if(err) {
-
-                db.rollback()
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
@@ -27,7 +25,6 @@ const fs = require('fs');
             
              }
              else {
-                db.commit()
                   res.status(200).send(result[0]);
              }
          })

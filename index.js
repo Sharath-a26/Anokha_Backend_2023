@@ -3,7 +3,7 @@ const helmet = require('helmet')
 require('dotenv').config()
 const createTables = require('./Relations/createRelations');
 const dropTables = require('./Relations/dropRelations');
-const createTransactionTable = require('./Relations/createTransactionsTable')
+const createTransactionTable = require('./Relations/createTransactionsTable.js')
 const dropTransactionTable = require('./Relations/dropTransactionsTable')
 const cluster = require('cluster');
 const { pid } = require('process');
@@ -13,7 +13,7 @@ const server = express()
 
 const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
-const keyGenerator = require('./AssymetricKeyPair/key');
+const {generateKey, generateTransactionKey} = require('./AssymetricKeyPair/key');
 
 const initialize = () => {
     //Drop command. Please be carefull!!
@@ -26,7 +26,8 @@ const initialize = () => {
     insertDummyData(db, transactions_db);
 
     //Key Generator
-    keyGenerator();
+    //generateKey();
+    //generateTransactionKey();
 }
 
 
