@@ -1,6 +1,5 @@
 const express = require('express')
 const helmet = require('helmet')
-require('dotenv').config()
 const createTables = require('./Relations/createRelations');
 const dropTables = require('./Relations/dropRelations');
 const createTransactionTable = require('./Relations/createTransactionsTable.js')
@@ -14,6 +13,8 @@ const server = express()
 const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
 const {generateKey, generateTransactionKey} = require('./AssymetricKeyPair/key');
+
+const PORT = 3000;
 
 const initialize = () => {
     //Drop command. Please be carefull!!
@@ -41,12 +42,12 @@ const initialize = () => {
     server.use('/adminApp', adminAppRouter);
 
     //Thread listening on port PORT
-    server.listen(process.env.PORT,  (err) => {
+    server.listen(PORT,  (err) => {
         if(err){
             console.log("Error starting server");
         }
         else{
-            console.log(`Process ${pid} listening on port ${process.env.PORT}`)
+            console.log(`Process ${pid} listening on port ${PORT}`)
         }
     })
 

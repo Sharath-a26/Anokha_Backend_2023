@@ -1,11 +1,11 @@
 const mysql = require('mysql');
-require('dotenv').config()
+
 
 const db = mysql.createConnection({
-    host: process.env.HOST,
-    user: process.env.USERNAME,
-    password: process.env.PASSWORD,
-    database: process.env.DATABASE
+    host: 'localhost',
+    user: 'root',
+    password: 'password',
+    database: 'anokha'
 });
 
 db.connect((err) => {
@@ -21,10 +21,10 @@ db.connect((err) => {
 
 
 const transactions_db = mysql.createConnection({
-    host: process.env.HOST,
-    user: process.env.USERNAME,
-    password: process.env.PASSWORD,
-    database: process.env.TRANSACTIONS_DATABASE
+    host: 'localhost',
+    user: 'root',
+    password: 'password',
+    database: 'anokha_transactions'
 })
 
 transactions_db.connect((err) => {
