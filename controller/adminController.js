@@ -35,7 +35,7 @@ const validator = require('validator');
      getEventDetails : [tokenValidator, (req, res) => {
         var sql_q = "";
         var params = []
-        if(validator.isEmpty(req.params.eventDate) && validator.isEmail(req.params.eventManagerEmail))
+        if(req.params.eventDate == undefined && validator.isEmail(req.params.eventManagerEmail))
         {
             sql_q = `select * from EventData where eventManagerEmail = ?`;
             params = [req.params.eventManagerEmail]
