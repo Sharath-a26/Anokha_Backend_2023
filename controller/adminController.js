@@ -34,31 +34,14 @@ const validator = require('validator');
 
      getEventDetails : [tokenValidator, (req, res) => {
         var sql_q = "";
-        var params = []
-        console.log(req.params);
-        if(req.params.eventDate == undefined && validator.isEmail(req.params.eventManagerEmail))
+        if(req.body.eventDate == undefined && validator.isEmail(req.params.eventManagerEmail))
         {
             sql_q = `select * from EventData where eventManagerEmail = ?`;
             params = [req.params.eventManagerEmail]
-            db.query(sql_q,params, (err, result) => {
-                if(err)
-                {
-                    const now = new Date();
-                    now.setUTCHours(now.getUTCHours() + 5);
-                    now.setUTCMinutes(now.getUTCMinutes() + 30);
-                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                    res.status(500).send({error : "Query Error... Contact DB Admin"});
-                }
-                else{
-                    res.status(200).send(result);
-                }
-            })
         }
-        else if (validator.isEmail(req.params.eventManagerEmail) && validator.isString(req.params.eventDate)){
+        else if (validator.isEmail(req.params.eventManagerEmail)){
             sql_q = `select * from EventData where eventManagerEmail = ? and date = ?`;
-            params = [req.params.eventManagerEmail,req.params.eventDate]
+            params = [req.params.eventManagerEmail,req.body.eventDate]
         }
        
         db.query(sql_q,params, (err, result) => {
@@ -71,9 +54,11 @@ const validator = require('validator');
                 fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
                 fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
                 res.status(500).send({error : "Query Error... Contact DB Admin"});
+                return;
             }
             else{
                 res.status(200).send(result);
+                return;
             }
         })
      }],
@@ -215,7 +200,6 @@ const validator = require('validator');
                 res.status(500).send({error : "Query Error"})
             }
             else{
-                db.commit()
                 if(result.affectedRows == 0)
                     {
                         res.status(400).send({"error" : "Error in data"});
