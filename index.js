@@ -32,7 +32,7 @@ const initialize = () => {
 
 
     //Please be careful. Dont run this command if you have data in backend.
-    //initialize();
+    initialize();
     server.use(helmet())
     server.use(express.json());
     
