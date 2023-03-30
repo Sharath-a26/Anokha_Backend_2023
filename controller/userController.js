@@ -12,7 +12,7 @@ const transactionTokenGenerator = require('../middleware/transactionTokenGenerat
 const transactionTokenVerifier = require('../middleware/transactionTokenVerifier');
 module.exports = {
     getEventsByDepartment : [tokenValidator, (req, res) => {
-        let sql_q = "SELECT * FROM EventData LEFT JOIN DepartmentData ON EventData.DepartmentAbbr = DepartmentData.DepartmentAbbr order by EventData.DepartmentAbbr";
+        let sql_q = "select * from AnokhaEventsAndDepartments";
 
         db.query(sql_q, (err, result) => {
             if(err){
@@ -62,7 +62,7 @@ module.exports = {
         if(validator.isEmail(req.params.userEmail))
         {
 
-        let sql_q = `select * from UserData where userEmail = ?`;
+        let sql_q = `select * from AnokhaUserData where userEmail = ?`;
         db.beginTransaction()
         db.query(
             sql_q,[req.params.userEmail],(err,result) => {
@@ -134,8 +134,8 @@ module.exports = {
 ,
 
     userLogin : (req, res) => {
-        if(!validator.isEmpty(req.body.userEmail) || !validator.isEmpty(req.body.password) || validator.isEmail(req.body.userEmail)){
-        let sql_q = `select * from UserData left join CollegeData on UserData.collegeId = CollegeData.collegeId where userEmail = ? and password = ?`
+        if(req.body.userEmail != undefined && req.body.password != undefined && !validator.isEmpty(req.body.userEmail) && !validator.isEmpty(req.body.password) && validator.isEmail(req.body.userEmail)){
+        let sql_q = `select * from AnokhaCompleteUserData where userEmail = ? and password = ?`
         db.query(sql_q,[req.body.userEmail,req.body.password], async (err, result) => {
             if(err){
                 const now = new Date();
@@ -200,7 +200,7 @@ module.exports = {
             else{
                 db.beginTransaction()
 
-                db.query(`select * from UserData where userEmail = ?`,[req.body.userEmail], (err, result) =>{
+                db.query(`select * from AnokhaUserData where userEmail = ?`,[req.body.userEmail], (err, result) =>{
                     if(err)
                     {
                         db.rollback()
@@ -308,7 +308,7 @@ module.exports = {
         const otp = req.body.otp;
         const userEmail = req.body.userEmail;
 
-        db.query(`select * from  OTP where userEmail = ? and otp = ?`,[userEmail,otp], (err, result) => {
+        db.query(`select * from  AnokhaOTP where userEmail = ? and otp = ?`,[userEmail,otp], (err, result) => {
             if(err)
             {
                 const now = new Date();
@@ -424,7 +424,7 @@ module.exports = {
         }
         else{
 
-        db.query(`select * from starredevents LEFT JOIN  eventdata ON starredevents.eventId = eventdata.eventId where userEmail = ?`,[req.params.userEmail], (err, result) =>  {
+        db.query(`select * from AnokhaStarredEventsData where userEmail = ?`,[req.params.userEmail], (err, result) =>  {
             if(err)
             {
                 const now = new Date();
@@ -444,7 +444,7 @@ module.exports = {
 
     getCrewDetails : [
         tokenValidator,(req,res) => {
-            let sql_q = `select crewEmail,name,departmentAbbr,role,crewmembers.teamId from crewmembers left join crewdetails on crewmembers.teamId = crewdetails.teamId`;
+            let sql_q = `select * from AnokhaCrewCompleteData`;
     
             db.query(sql_q,(err,result) => {
                 if(err) {
@@ -464,7 +464,7 @@ module.exports = {
     ],
 
     getAllEvents : [tokenValidator, (req, res) => {
-        db.query(`select * from EventData`, (err, result) => {
+        db.query(`select * from AnokhaEventData`, (err, result) => {
             if(err)
             {
                     const now = new Date();
@@ -543,6 +543,9 @@ module.exports = {
         })
     }
     }]
+
+
+
 
 
 

@@ -13,6 +13,7 @@ const server = express()
 const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
 const {generateKey, generateTransactionKey} = require('./AssymetricKeyPair/key');
+const createViews = require('./ViewGenerator/views.js');
 
 const PORT = 3000;
 
@@ -26,14 +27,18 @@ const initialize = () => {
     //Inserting Sample Data. Please be careful!
     insertDummyData(db, transactions_db);
 
+    createViews();
+
     //Key Generator
     //generateKey();
     //generateTransactionKey();
+
+    console.log("initialization Done...");
 }
 
 
     //Please be careful. Dont run this command if you have data in backend.
-    //initialize();
+    initialize();
     server.use(helmet())
     server.use(express.json());
     

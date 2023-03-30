@@ -12,7 +12,7 @@ const validator = require('validator');
             res.status(400).send({"error" : "You need to be much better to do so..."});
         }
         else{
-         let sql_q = `select * from eventManager where eventManagerEmail = ?`;
+         let sql_q = `select * from AnokhaEventManager where eventManagerEmail = ?`;
          db.query(sql_q,[req.params.adminEmail],(err,result) => {
              if(err) {
                 const now = new Date();
@@ -36,11 +36,11 @@ const validator = require('validator');
         var sql_q = "";
         if(req.body.eventDate == undefined && validator.isEmail(req.params.eventManagerEmail))
         {
-            sql_q = `select * from EventData where eventManagerEmail = ?`;
+            sql_q = `select * from AnokhaEventData where eventManagerEmail = ?`;
             params = [req.params.eventManagerEmail]
         }
         else if (validator.isEmail(req.params.eventManagerEmail)){
-            sql_q = `select * from EventData where eventManagerEmail = ? and date = ?`;
+            sql_q = `select * from AnokhaEventData where eventManagerEmail = ? and date = ?`;
             params = [req.params.eventManagerEmail,req.body.eventDate]
         }
        
@@ -117,7 +117,7 @@ const validator = require('validator');
             res.status(400).send({"error" : "You need to be much better to do so..."});
         }
         else{
-        let sql_q = `select * from EventManager where eventManagerEmail = ? and password = ?`
+        let sql_q = `select * from AnokhaEventManager where eventManagerEmail = ? and password = ?`
         db.beginTransaction()
         db.query(sql_q, [req.body.eventManagerEmail,req.body.password],async (err, result) => {
             if(err){
