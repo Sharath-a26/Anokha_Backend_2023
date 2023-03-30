@@ -111,7 +111,7 @@ const validator = require('validator');
      }],
 
      adminLogin :  (req, res) => {
-        if(!validator.isEmail(req.body.eventManagerEmail) ||
+        if(req.body.eventManagerEmail == undefined || req.body.password == undefined || !validator.isEmail(req.body.eventManagerEmail) ||
         validator.isEmpty(req.body.password))
         {
             res.status(400).send({"error" : "You need to be much better to do so..."});
