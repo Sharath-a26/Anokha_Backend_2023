@@ -164,8 +164,7 @@ const validator = require('validator');
             res.status(400).send({"error" : "You need to be much better to do so..."});
         }
         else{
-        let sql = `select * from userData where userEmail in (select userEmail from registeredevents where eventId = 
-            (select eventId from eventData where eventId = ?));`
+        let sql = `select * from AnokhaEventRegisteredStudents where eventId = ?`
         db.beginTransaction()
         db.query(sql,[req.params.eventId],(err,result) => {
             if(err) {
