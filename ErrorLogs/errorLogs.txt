@@ -1,3 +1,147 @@
 --- Anokha Error Log Files ---
 
 
+2023-04-01 09:39:20
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:40:49
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:41:10
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:41:19
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:41:44
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:41:51
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:42:08
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:42:50
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:43:04
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:44:27
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:44:28
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 09:44:55
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 10:01:05
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 10:02:56
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 10:03:21
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 10:03:30
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-01 13:30:14
+Error: Incorrect parameter count in the call to native function 'RELEASE_LOCK'
+
+2023-04-01 13:30:29
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:34
+2023-04-01 13:30:40
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:41
+2023-04-01 13:30:42
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:42
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:43
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:43
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:44
+2023-04-01 13:30:44
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:45
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:45
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:46
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:46
+2023-04-01 13:30:47
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:47
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:47
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:48
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:49
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-5' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:30:49
+Error: Incorrect parameter count in the call to native function 'RELEASE_LOCK'
+
+2023-04-01 13:31:33
+2023-04-01 13:35:17
+Error: Duplicate entry 'cb.en.u4cse20010@cb.students.amrita.edu-6' for key 'starredevents.PRIMARY'
+
+Error: Duplicate entry 'cb.en.u4cse20015@cb.students.amrita.edu-1' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:36:15
+2023-04-01 13:38:43
+Error: Duplicate entry 'cb.en.u4cse20015@cb.students.amrita.edu-1' for key 'starredevents.PRIMARY'
+
+Error: Duplicate entry 'cb.en.u4cse20015@cb.students.amrita.edu-4' for key 'starredevents.PRIMARY'
+
+2023-04-01 13:38:55
+Error: Cannot add or update a child row: a foreign key constraint fails (`anokha`.`starredevents`, CONSTRAINT `starredevents_ibfk_1` FOREIGN KEY (`eventId`) REFERENCES `eventdata` (`eventId`))
+
+2023-04-01 13:38:58
+2023-04-02 14:34:11
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-02 14:35:09
+ReferenceError: b_connection is not defined
+
+2023-04-02 14:46:54
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-02 14:47:12
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-02 15:31:23

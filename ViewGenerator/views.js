@@ -1,6 +1,4 @@
-const {db, transactions_db} = require('./../connection.js');
-
-const createViews = () =>{
+const createViews = (db, transactions_db) =>{
     //General Views
     db.query(`create view AnokhaCollegeData as select * from CollegeData`, (err, result)=>{if(err) console.log("Error in AnokhaCollegeData")});
     db.query(`create view AnokhaCrewDetails as select * from CrewDetails`, (err, result)=>{if(err) console.log("Error in AnokhaCrewDetails")});

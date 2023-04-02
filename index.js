@@ -6,7 +6,6 @@ const createTransactionTable = require('./Relations/createTransactionsTable.js')
 const dropTransactionTable = require('./Relations/dropTransactionsTable')
 const cluster = require('cluster');
 const { pid } = require('process');
-const {db, transactions_db} = require('./connection');
 const insertDummyData = require('./SampleData/dummyData');
 const server = express()
 
@@ -14,31 +13,13 @@ const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
 const {generateKey, generateTransactionKey} = require('./AssymetricKeyPair/key');
 const createViews = require('./ViewGenerator/views.js');
+const establishConnection = require('./initializeConnection.js');
+
+const numberOfSlaves = 10;
 
 const PORT = 3000;
 
-const initialize = () => {
-    //Drop command. Please be carefull!!
-    dropTables(db);
-    dropTransactionTable(transactions_db);
-    //Creating tables. Please be careful!
-    createTables(db);  
-    createTransactionTable(transactions_db); 
-    //Inserting Sample Data. Please be careful!
-    insertDummyData(db, transactions_db);
 
-    createViews();
-
-    //Key Generator
-    //generateKey();
-    //generateTransactionKey();
-
-    console.log("initialization Done...");
-}
-
-
-    //Please be careful. Dont run this command if you have data in backend.
-    initialize();
     server.use(helmet())
     server.use(express.json());
     
@@ -46,15 +27,58 @@ const initialize = () => {
     server.use('/userApp', userAppRouter);
     server.use('/adminApp', adminAppRouter);
 
-    //Thread listening on port PORT
-    server.listen(PORT,  (err) => {
-        if(err){
-            console.log("Error starting server");
+ 
+
+
+
+    if (cluster.isMaster) {
+        console.log(`Master ${process.pid} is running`);
+
+        db = establishConnection();
+
+        const initialize = () => {
+            //Drop command. Please be carefull!!
+            dropTables(db[0]);
+            dropTransactionTable(db[1]);
+            //Creating tables. Please be careful!
+            createTables(db[0]);  
+            createTransactionTable(db[1]); 
+            //Inserting Sample Data. Please be careful!
+            insertDummyData(db[0], db[1]);
+        
+            createViews(db[0], db[1]);
+        
+            //Key Generator
+            //generateKey();
+            //generateTransactionKey();
+        
+            console.log("initialization Done...");
         }
-        else{
-            console.log(`Process ${pid} listening on port ${PORT}`)
+        
+        
+            //Please be careful. Dont run this command if you have data in backend.
+            //initialize();
+      
+        // Fork workers
+        for (let i = 0; i < numberOfSlaves; i++) {
+          cluster.fork();
         }
-    })
+      
+        cluster.on('exit', (worker, code, signal) => {
+          console.log(`Worker ${worker.process.pid} died`);
+        });
+    }
+
+    else{
+        server.listen(PORT,  (err) => {
+                if(err){
+                    console.log("Error starting server");
+                }
+                else{
+                    console.log(`Process ${pid} listening on port ${PORT}`)
+                }
+            })
+    }
 
     
     

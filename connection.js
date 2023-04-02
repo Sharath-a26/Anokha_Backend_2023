@@ -1,41 +1,25 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'password',
-    database: 'anokha'
-});
-
-db.connect((err) => {
-    if(err)
-    {
-        console.log("Failed to connect to MySequel");
-        console.log(err);
-    }
-    else{
-       console.log("Connected to MySequel...");
-    }
+    database: 'anokha',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
 
-const transactions_db = mysql.createConnection({
+const transactions_db = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'password',
-    database: 'anokha_transactions'
-})
-
-transactions_db.connect((err) => {
-    if(err)
-    {
-        console.log("Failed to connect to MySequel (Transactions)");
-        console.log(err);
-    }
-    else{
-       console.log("Connected to MySequel (Transactions)...");
-    }
+    database: 'anokha_transactions',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 })
 
 module.exports = {db, transactions_db};

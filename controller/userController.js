@@ -11,176 +11,215 @@ const fs = require('fs');
 const transactionTokenGenerator = require('../middleware/transactionTokenGenerator');
 const transactionTokenVerifier = require('../middleware/transactionTokenVerifier');
 module.exports = {
-    getEventsByDepartment : [tokenValidator, (req, res) => {
-        let sql_q = "select * from AnokhaEventsAndDepartments";
-
-        db.query(sql_q, (err, result) => {
-            if(err){
-
-                const now = new Date();
-                now.setUTCHours(now.getUTCHours() + 5);
-                now.setUTCMinutes(now.getUTCMinutes() + 30);
-                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                res.status(500).send({error : "Query Error... Contact DB Admin"});
-            }
-            else{
 
 
-                var jsonResponse = [];
-                var eventsByDepartment = {};
-                var department = "";
-                result.forEach(eventData => {
-                    if(eventData.departmentAbbr == department)
-                    {
-                       eventsByDepartment["events"].push(eventData);
-                    }
-                    else
-                    {
-                        if(department != "")
+    getEventsByDepartment : [tokenValidator, async (req, res) => {
+
+        const db_connection = await db.promise().getConnection();
+        try{
+            let sql_q = "select * from AnokhaEventsAndDepartments order by departmentAbbr";
+            const [results] = await db_connection.query(sql_q);
+            var jsonResponse = [];
+           if(results.length != 0)
+           {
+                    var eventsByDepartment = {};  
+                    var department = "";
+                    results.forEach(eventData => {
+                        if(eventData.departmentAbbr == department)
                         {
-                            jsonResponse.push(eventsByDepartment);
+                           eventsByDepartment["events"].push(eventData);
                         }
-                        eventsByDepartment = {
-                            department : eventData.departmentName,
-                            events : [eventData]
+                        else
+                        {
+                            if(department != "")
+                            {
+                                jsonResponse.push(eventsByDepartment);
+                            }
+                            eventsByDepartment = {
+                                department : eventData.departmentName,
+                                events : [eventData]
+                            }
+                            department = eventData.departmentAbbr;
+    
                         }
-                        department = eventData.departmentAbbr;
+                    });
+           }
 
-                    }
-                });
-                res.status(200).send(jsonResponse);
-                
 
-            }
-        });
-    }],
-
-    getUserDetails : [tokenValidator, (req,res) => {
-
-        if(validator.isEmail(req.params.userEmail))
-        {
-
-        let sql_q = `select * from AnokhaUserData where userEmail = ?`;
-        db.beginTransaction()
-        db.query(
-            sql_q,[req.params.userEmail],(err,result) => {
-                if(err){
-                    db.rollback()
-                    const now = new Date();
-                    now.setUTCHours(now.getUTCHours() + 5);
-                    now.setUTCMinutes(now.getUTCMinutes() + 30);
-                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                    res.status(500).send({error : "Query Error... Contact DB Admin"});
-                }
-                else {
-                    db.commit()
-
-                    if(result.length == 0)
-                    {
-                        res.status(200).send({});
-
-                    }
-                    else{
-                        res.status(200).send(result[0]);
-                    }
-                
-                }
-            }
-        )
+            res.status(200).send(jsonResponse);
         }
-        else{
-            res.status(400).send({error : "you need to much better to do so..."})
-        }
+
+        catch (err) {
+            const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+          } finally {
+            db_connection.release();
+          }
+
         
     }],
 
-    editUserDetails: [tokenValidator, (req,res) => {
-        const data = req.body;
-        if(validator.isEmpty(req.body.fullName) ||
+
+
+
+
+
+    getUserDetails : [tokenValidator, async (req, res) => {
+        if(validator.isEmail(req.params.userEmail))
+         {
+
+        const db_connection = await db.promise().getConnection();
+        try{
+            let sql_q = "select * from AnokhaUserData where userEmail = ?";
+            const [results] = await db_connection.query(sql_q, req.params.userEmail);
+            res.status(200).send(results);
+        }
+
+        catch (err) {
+            const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+          } finally {
+            db_connection.release();
+          }
+        }
+        else{
+            res.status(400).send({error : "We are one step ahead! Try harder!"});
+            return;
+            }
+
+
+    }],
+
+
+
+
+
+    editUserDetails: [tokenValidator, async (req,res) => {
+        if(req.body.fullName == undefined ||
+            req.body.password == undefined ||
+            req.body.userEmail == undefined ||
+            validator.isEmpty(req.body.fullName) ||
             validator.isEmpty(req.body.password) ||
-            validator.isEmpty(req.body.collegeId) ||
             validator.isEmpty(req.body.userEmail) ||
             !validator.isEmail(req.body.userEmail)
             )
             {
-                res.status(400).send({error : "you need to much better to do so..."});
+                res.status(400).send({error : "We are one step ahead! Try harder!"});
+                return;
             }
             else{
-        db.beginTransaction()
-        let sql = `Update userData SET fullName = ?,password = ?, collegeId = ? where userEmail = ?`
-        db.query(sql,[req.body.fullName,req.body.password,req.body.collegeId,req.body.userEmail],(err,result,fields) => {
-            if(err) {
-                db.rollback()
-                const now = new Date();
-                now.setUTCHours(now.getUTCHours() + 5);
-                now.setUTCMinutes(now.getUTCMinutes() + 30);
-                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                res.status(500).send({error : "Query Error... Contact DB Admin"});
-            }
-            else {
-                db.commit()
-                res.status(200).send({result : "Updated Successfully"})
-                
-            }
-        })
-    }
-    }]
-,
-
-    userLogin : (req, res) => {
-        if(req.body.userEmail != undefined && req.body.password != undefined && !validator.isEmpty(req.body.userEmail) && !validator.isEmpty(req.body.password) && validator.isEmail(req.body.userEmail)){
-        let sql_q = `select * from AnokhaCompleteUserData where userEmail = ? and password = ?`
-        db.query(sql_q,[req.body.userEmail,req.body.password], async (err, result) => {
-            if(err){
-                const now = new Date();
-                now.setUTCHours(now.getUTCHours() + 5);
-                now.setUTCMinutes(now.getUTCMinutes() + 30);
-                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-
-                res.status(500).send({error : "Query Error... Contact DB Admin"});
-            }
-            else
+        let sql_q = `Update userData SET fullName = ?,password = ? where userEmail = ?`
+        let db_connection = await db.promise().getConnection();
+        try{
+            const lockName = "EDITUSERDETAILS";
+            const lockTimeout = 10;
+            await db_connection.query(`SELECT GET_LOCK(?, ?)`, [lockName, lockTimeout]);
+            const [results] = await db_connection.query(sql_q, [req.body.fullName,req.body.password,req.body.userEmail]); 
+            await db_connection.query(`SELECT RELEASE_LOCK(?)`, [lockName]);
+            if(results.affectedRows == 0)
             {
-                if(result.length == 0)
-                {
-                    res.status(404).send({error : "User not found"})
-                }
-                else{
-
-                        const token = await tokenGenerator({
-                            userEmail : req.body.userEmail,
-                            password : req.body.password
-                        });
-                        res.json({
-                            
-                                userEmail : result[0].userEmail,
-                                fullName : result[0].fullName,
-                                activePassport : result[0].activePassport,
-                                isAmritaCBE : result[0].isAmritaCBE,
-                                collegeName : result[0].collegeName,
-                                district : result[0].district,
-                                state : result[0].state,
-                                country : result[0].country,
-                                SECRET_TOKEN : token
-                            
-                        });
-                    
-                }
+                res.status(400).send({"error" : "no data found. dont play around here..."});
             }
-        })
+            else{
+                res.status(200).send({"result" : "data updated..."});
+            }
+
         }
-        else{
-            res.status(400).send({error : "you need to much better to do so..."});
+        catch(err){
+            const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+          } finally {
+            db_connection.release();
+          }
+   
+    }
+    }],
+
+
+
+
+
+
+
+
+    userLogin : async (req, res) => {
+        if(req.body.userEmail != undefined && req.body.password != undefined && !validator.isEmpty(req.body.userEmail) && !validator.isEmpty(req.body.password) && validator.isEmail(req.body.userEmail)){
+        
+        let db_connection = await db.promise().getConnection();
+        try{
+            
+            let sql_q = `select * from AnokhaCompleteUserData where userEmail = ? and password = ?`;
+            const [result] = await db_connection.query(sql_q, [req.body.userEmail, req.body.password]);
+            if(result.length == 0)
+            {
+                res.status(404).send({error : "User not found"});
+                return;
+            }
+            else{
+
+                const token = await tokenGenerator({
+                    userEmail : result[0].userEmail,
+                    fullName : result[0].fullName,
+                    collegeName : result[0].collegeName,
+                    district : result[0].district,
+                    country : result[0].country,
+                });
+                res.json({
+                    
+                        userEmail : result[0].userEmail,
+                        fullName : result[0].fullName,
+                        activePassport : result[0].activePassport,
+                        isAmritaCBE : result[0].isAmritaCBE,
+                        collegeName : result[0].collegeName,
+                        district : result[0].district,
+                        state : result[0].state,
+                        country : result[0].country,
+                        SECRET_TOKEN : token
+                    
+                });
+            
+            }
+        }
+        catch(err)
+        {
+            const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+        }
+        finally 
+        {
+            db_connection.release();
+        }   
+        }
+        else
+        {
+            res.status(400).send({error : "We are one step ahead! Try harder!"});
+            return;
         }
     },
+
+
+
+
     
 
     registerUser :(req, res) =>{
@@ -194,7 +233,8 @@ module.exports = {
             !validator.isBoolean(req.body.collegeId))
             
             {
-                res.status(400).send({"error" : "You need to be much better to do so..."});
+                res.status(400).send({error : "We are one step ahead! Try harder!"});
+                return;
             }
 
             else{
@@ -302,7 +342,8 @@ module.exports = {
         !validator.isEmail(req.body.userEmail) ||
         !validator.isNumeric(req.body.otp))
         {
-            res.status(400).send({"error" : "You need to be much better to do so..."});
+            res.status(400).send({error : "We are one step ahead! Try harder!"});
+            return;
         }
         else{
         const otp = req.body.otp;
@@ -344,88 +385,88 @@ module.exports = {
 
 
     insertStarredEvent : [
-        tokenGenerator,(req,res) => {
+        tokenValidator,
+       async (req,res) => {
 
-            if(!validator.isEmail(req.body.userEmail)
+            if(req.body.userEmail == undefined ||
+                req.body.eventId == undefined ||
+                !validator.isEmail(req.body.userEmail)
             ||
             !validator.isNumeric(req.body.eventId))
             {
-                res.status(400).send({"error" : "You need to be much better to do so..."});
+                res.status(400).send({error : "We are one step ahead! Try harder!"});
+                return;
             }
             else{
 
-            let user_email = req.body.userEmail;
-            let event_id = req.body.eventId;
             let sql_q = `insert into starredevents values (?,?)`
-            db.query(sql_q,[event_id,user_email],(err,result) => {
-                if(err) {
+            let db_connection = await db.promise().getConnection();
+            try{
+                const lockName = "INSERTSTARREDEVENTS";
+                const lockTimeout = 10;
+                await db_connection.query(`SELECT GET_LOCK(?, ?)`, [lockName, lockTimeout]);
+                const [results] = await db_connection.query(sql_q, [req.body.eventId,req.body.userEmail]); 
+                await db_connection.query(`SELECT RELEASE_LOCK(?)`, [lockName]);
+                if(results.affectedRows == 0)
+                {
+                    res.status(400).send({"error" : "no data found. dont play around here..."});
+                }
+                else{
+                    res.status(200).send({"result" : "data updated..."});
+                }
+    
+            }
+            catch(err)
+            {
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
                 const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
                 fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
                 fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                    res.status(400).send({"error" : "Error in data"});
-                }
-                else {
-                    res.status(201).send({result : "Inserted successfully"})
-                }
-            })
-        }
+                res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+            }
+            finally{
+                db_connection.release();
+            }
+            }
         }
     ],
 
-    dropStarredEvent : [
-        tokenValidator,(req,res) => {
 
-            if(!validator.isEmail(req.body.userEmail) ||
+
+    dropStarredEvent : [
+        tokenValidator,async (req,res) => {
+
+            if(req.body.userEmail == undefined ||
+                req.body.eventId == undefined ||
+                !validator.isEmail(req.body.userEmail) ||
             !validator.isNumeric(req.body.eventId))
             {
-                res.status(400).send({"error" : "You need to be much better to do so..."});
+                res.status(400).send({error : "We are one step ahead! Try harder!"});
+                return;
             }
             else{
 
             let user_email = req.body.userEmail;
             let event_id = req.body.eventId;
             let sql_q = `delete from starredevents where (userEmail = ? and eventId = ?)`;
-            db.query(sql_q,[user_email,event_id],(err,result) => {
-                if(err) {
-                    const now = new Date();
-                    now.setUTCHours(now.getUTCHours() + 5);
-                    now.setUTCMinutes(now.getUTCMinutes() + 30);
-                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                    res.status(400).send({"error" : "Error in data"})
+            let db_connection = await db.promise().getConnection();
+            try{
+                const lockName = "INSERTSTARREDEVENTS";
+                const lockTimeout = 10;
+                await db_connection.query(`SELECT GET_LOCK(?, ?)`, [lockName, lockTimeout]);
+                const [results] = await db_connection.query(sql_q, [req.body.userEmail, req.body.eventId]); 
+                await db_connection.query(`SELECT RELEASE_LOCK(?)`, [lockName]);
+                if(results.affectedRows == 0)
+                {
+                    res.status(400).send({"error" : "no data found. dont play around here..."});
                 }
-                else {
-                    
-                    if(result.affectedRows == 0)
-                    {
-                        res.status(400).send({"error" : "Error in data"});
-                    }
-                    else{
-                    res.status(202).send({result : "Deleted successfully"});
-                    }
+                else{
+                    res.status(200).send({"result" : "data updated..."});
                 }
-            })
-        }
-        }
-    ],
-
-
-
-    getStarredEvents : [tokenValidator, (req, res) => {
-
-        if(!validator.isEmail(req.params.userEmail))
-        {
-            res.status(400).send({"error" : "You need to be much better to do so..."});
-
-        }
-        else{
-
-        db.query(`select * from AnokhaStarredEventsData where userEmail = ?`,[req.params.userEmail], (err, result) =>  {
-            if(err)
+            }
+            catch(err)
             {
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
@@ -433,60 +474,110 @@ module.exports = {
                 const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
                 fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
                 fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                req.status(500).send({"error" : "error in db query... contact db admin"});
+                res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
             }
-            else{
-                res.status(200).send(result);
+            finally{
+                db_connection.release();
             }
-        })
-    }
-    }],
-
-    getCrewDetails : [
-        tokenValidator,(req,res) => {
-            let sql_q = `select * from AnokhaCrewCompleteData`;
-    
-            db.query(sql_q,(err,result) => {
-                if(err) {
-                    const now = new Date();
-                    now.setUTCHours(now.getUTCHours() + 5);
-                    now.setUTCMinutes(now.getUTCMinutes() + 30);
-                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                    req.status(500).send({"error" : "error in db query... contact db admin"});
-                }
-                else {
-                    res.status(200).send(result);
-                }
-            })
+        }
         }
     ],
 
-    getAllEvents : [tokenValidator, (req, res) => {
-        db.query(`select * from AnokhaEventData`, (err, result) => {
-            if(err)
-            {
-                    const now = new Date();
-                    now.setUTCHours(now.getUTCHours() + 5);
-                    now.setUTCMinutes(now.getUTCMinutes() + 30);
-                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                    req.status(500).send({"error" : "error in db query... contact db admin"});
+
+
+
+    getStarredEvents : [tokenValidator, async (req, res) => {
+
+        if(req.params.userEmail == undefined ||
+            !validator.isEmail(req.params.userEmail))
+        {
+            res.status(400).send({error : "We are one step ahead! Try harder!"});
+            return;
+
+        }
+        else{
+
+            let db_connection = await db.promise().getConnection();
+            try{
+                const [result] = await db_connection.query(`select * from AnokhaStarredEventsData where userEmail = ?`,[req.params.userEmail]);
+                res.send(result);
             }
-            else{
-                res.status(200).send(result);
+            catch{
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
             }
-        })
+           finally{
+               await db_connection.release();
+            }
+    }
     }],
 
-    moveToTransaction : async (req, res) => {
+
+
+
+    getCrewDetails : [tokenValidator,
+       async (req,res) => {
+            let db_connection = await db.promise().getConnection();
+            let sql_q = `select * from AnokhaCrewCompleteData`;
+            try{
+            const [result] = await db_connection.query(sql_q);
+            res.status(200).send(result);
+            }
+            catch(err)
+            {
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+
+            }
+            finally{
+                await db_connection.release();
+            }
+            
+        }
+    ],
+
+
+
+    getAllEvents : [tokenValidator, async (req, res) => {
+        let db_connection = await db.promise().getConnection();
+        try{
+            const [result] = await db_connection.query(`select * from AnokhaEventData`);
+            res.status(200).send(result);
+        }
+        catch(err)
+        {
+            const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+
+        }
+        finally{
+            await db_connection.release();
+        }
+    }],
+
+
+
+    moveToTransaction : [async (req, res) => {
         const tokenHeader = req.headers.authorization;
         const token = tokenHeader && tokenHeader.split(' ')[1];
         if(token == null)
         {
-            res.status(400).send({"error" : "You need to be much better to do so..."});
+            res.status(400).send({error : "We are one step ahead! Try harder!"});
             return;
         }
         const transactionToken = await transactionTokenGenerator({
@@ -498,9 +589,9 @@ module.exports = {
             return;
         }
         res.status(200).send({"TRANSACTION_SECRET_TOKEN" : transactionToken});
-    },
+    }],
 
-    initiateTransaction : [transactionTokenVerifier, (req, res) => {
+    initiateTransaction : [transactionTokenVerifier, async (req, res) => {
         if(
             validator.isEmpty(req.body.transactionId) ||
             !validator.isEmail(req.body.userEmail) ||
@@ -521,34 +612,38 @@ module.exports = {
             req.body.amount == undefined
         )
         {
-            res.status(400).send({"error" : "Better luck next time..."});
+            res.status(400).send({error : "We are one step ahead! Try harder!"});
             return;
         }
         else{
-            const now = new Date();
-            now.setUTCHours(now.getUTCHours() + 5);
-            now.setUTCMinutes(now.getUTCMinutes() + 30);
-            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-            transactions_db.query(`insert into transactions (transactionId, userEmail, sender, senderAccNo, receiver, receiverAccNo, eventIdOrPassportId, amount, timeStamp, transactionStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.transactionId, req.body.userEmail, req.body.sender, req.body.senderAccNo, req.body.receiver, req.body.receiverAccNo, req.body.eventIdOrPassportId, req.body.amount, istTime, 0], (er, result) => {
-            if(err)
-            {
+
+            const db_connection = await transactions_db.promise().getConnection();
+            try{
+                const lockName = "INITIATETRANSACTION";
+                const lockTimeout = 10;
+                await db_connection.query(`SELECT GET_LOCK(?, ?)`, [lockName, lockTimeout]);
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
                 const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                req.status(500).send({"error" : "error in db query... contact db admin"});
+                const [result] = await db_connection.query(`insert into transactions (transactionId, userEmail, sender, senderAccNo, receiver, receiverAccNo, eventIdOrPassportId, amount, timeStamp, transactionStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.transactionId, req.body.userEmail, req.body.sender, req.body.senderAccNo, req.body.receiver, req.body.receiverAccNo, req.body.eventIdOrPassportId, req.body.amount, istTime, 0]);
+                await db_connection.query(`SELECT RELEASE_LOCK(?, ?)`, [lockName]);
             }
-        })
+            catch(err)
+            {
+                const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+            }
+
+            finally{
+                await db_connection.release();
+            }
     }
     }]
-
-
-
-
-
-
-
 
 }
