@@ -53,7 +53,7 @@ const validator = require('validator');
         parameters = []
         if(req.body.eventDate == undefined && req.params.userName != undefined)
         {
-            sql_q = `select * from AnokhaEventData where userName = ?`;
+            sql_q = `select * from EventData where userName = ?`;
             parameters = [req.params.userName]
         }
         else if (req.params.userName != undefined){
@@ -77,6 +77,7 @@ const validator = require('validator');
         }
         catch(err)
          {
+            console.log(err);
             const now = new Date();
             now.setUTCHours(now.getUTCHours() + 5);
             now.setUTCMinutes(now.getUTCMinutes() + 30);
