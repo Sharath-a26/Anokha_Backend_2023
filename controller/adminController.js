@@ -48,7 +48,7 @@ const validator = require('validator');
 
 
      getEventDetails : [tokenValidator, async(req, res) => {
-        if(req.authorization_tier == "ADMIN" || req.authorization_tier == "ADMIN"){
+        if(req.authorization_tier == "ADMIN"){
         var sql_q = "";
         parameters = []
         if(req.body.eventDate == undefined && req.params.userName != undefined)
