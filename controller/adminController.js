@@ -2,8 +2,72 @@ const { db, transactions_db } = require('../connection');
 const tokenGenerator = require('../middleware/tokenGenerator');
 const tokenValidator = require('../middleware/tokenValidator');
 const fs = require('fs');
+const rn = require('random-number');
 const validator = require('validator');
+const mailer = require('../Mailer/adminAppUser.js');
  module.exports = {
+
+
+
+    createAdminAppUsers : [tokenValidator, async (req, res) => {
+        if(req.authorization_tier == "SUPER"){
+            if(req.body.userEmail == undefined ||
+                !validator.isEmail(req.body.userEmail) ||
+                req.body.name == undefined ||
+                req.body.phoneNumber == undefined ||
+                req.body.role == undefined ||
+                ((req.body.role == "DEPTHEAD" || req.body.role == "FACCOORD" || req.body.role == "STDCOORD") && req.body.departmentAbbr == undefined)
+                )
+                {
+                    res.status(400).send({error : "Please Check Guys...."});
+                }
+                else{
+                    const gn = rn.generator({
+                        min: 100000,
+                        max: 999999,
+                        integer: true
+                    });
+                    
+                    const userName = `${req.body.role}_${gn()}`;
+                    const password = Math.random().toString(36).slice(2) + Math.random().toString(36).toUpperCase().slice(2);
+                    var department = "";
+                    if(req.body.departmentAbbr == undefined)
+                    {
+                        department = null;
+                    }
+                    else{
+                        department = req.body.departmentAbbr;
+                    }
+                    const db_connection = await db.promise().getConnection();
+                    try{
+                        var date_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
+                        const [result] = await db_connection.query(`insert into EventManager (userName,userEmail,name,password,timeStamp,phoneNumber,role) values (?,?,?,?,?,?,?)`, [userName, req.body.userEmail, req.body.name, password, date_time, req.body.phoneNumber, req.body.role]);
+                        mailer(req.body.name, req.body.userEmail, userName, password);
+                        res.status(201).send({"status" : "Done..."});
+                    }
+                    catch(err){
+                        const now = new Date();
+                        now.setUTCHours(now.getUTCHours() + 5);
+                        now.setUTCMinutes(now.getUTCMinutes() + 30);
+                        const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                        fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                        fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                        res.status(500).send({"Error" : err});
+                    }
+                    finally{
+                        await db_connection.release();
+                    }
+                }
+        }
+        else{
+            res.status(401).send({"error" : "You have no rights to be here!"})
+        }
+    }],
+
+
+
+
+
 
     getUserDetails : [tokenValidator, async (req,res) => {
         if(req.authorization_tier == "ADMIN"){
@@ -394,7 +458,7 @@ const validator = require('validator');
     }]
 
 
-    
+
     
 }
 

@@ -196,3 +196,12 @@ ReferenceError: token is not defined
 2023-04-03 15:37:13
 ReferenceError: token is not defined
 
+2023-04-04 01:16:19
+Error: Duplicate entry '7736361761' for key 'eventmanager.phoneNumber'
+
+2023-04-04 01:16:31
+Error: Duplicate entry 'kvaisakhkrishnan@gmail.com' for key 'eventmanager.userEmail'
+
+Error: Cannot add or update a child row: a foreign key constraint fails (`anokha`.`eventmanager`, CONSTRAINT `eventmanager_ibfk_1` FOREIGN KEY (`role`) REFERENCES `roles` (`role`))
+
+2023-04-04 01:16:34

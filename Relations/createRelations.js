@@ -30,7 +30,7 @@ const createTables = (db) => {
         }
     });
 
-    db.query("create table EventManager (userName varchar(65) PRIMARY KEY,name varchar(50) NOT NULL,password varchar(25) NOT NULL,timeStamp timestamp NOT NULL,phoneNumber char(10) NOT NULL unique, role varchar(10), departmentAbbr varchar(10), foreign key(role) references Roles(role), foreign key(departmentAbbr) references DepartmentData(departmentAbbr))",(err,result) => {
+    db.query("create table EventManager (userName varchar(65) PRIMARY KEY, userEmail varchar(65) unique,  name varchar(50) NOT NULL,password varchar(25) NOT NULL,timeStamp timestamp NOT NULL,phoneNumber char(10) NOT NULL unique, role varchar(10), departmentAbbr varchar(10), foreign key(role) references Roles(role), foreign key(departmentAbbr) references DepartmentData(departmentAbbr))",(err,result) => {
         if(err) {
             console.log("Failed to create ErrorManager table");
         }
@@ -90,7 +90,7 @@ const createTables = (db) => {
 
     
 
-    db.query("create table EventData (eventId int PRIMARY KEY AUTO_INCREMENT, eventName varchar(50) NOT NULL,eventOrWorkshop boolean NOT NULL, groupOrIndividual bool NOT NULL, maxCount int NOT NULL, description varchar(500) NOT NULL, url varchar(300) not null, userName varchar(65) not null,date varchar(20) NOT NULL,eventTime time NOT NULL,venue varchar(50) NOT NULL,fees int NOT NULL,totalNumberOfSeats int NOT NULL,noOfRegistrations int NOT NULL,timeStamp timestamp NOT NULL,refundable boolean NOT NULL,departmentAbbr varchar(10) not null,FOREIGN KEY(departmentAbbr) REFERENCES DepartmentData(departmentAbbr),FOREIGN KEY(userName) REFERENCES EventManager(userName))", (err,result) => {
+    db.query("create table EventData (eventId int PRIMARY KEY AUTO_INCREMENT, eventName varchar(50) NOT NULL,eventOrWorkshop boolean NOT NULL, groupOrIndividual bool NOT NULL, maxCount int NOT NULL, description varchar(500) NOT NULL, url varchar(300) not null, userEmail varchar(65) not null,date varchar(20) NOT NULL,eventTime time NOT NULL,venue varchar(50) NOT NULL,fees int NOT NULL,totalNumberOfSeats int NOT NULL,noOfRegistrations int NOT NULL,timeStamp timestamp NOT NULL,refundable boolean NOT NULL,departmentAbbr varchar(10) not null,FOREIGN KEY(departmentAbbr) REFERENCES DepartmentData(departmentAbbr),FOREIGN KEY(userEmail) REFERENCES EventManager(userEmail))", (err,result) => {
         if(err) {
             console.log("Failed to create EventData table");
         }
