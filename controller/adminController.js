@@ -6,7 +6,6 @@ const validator = require('validator');
  module.exports = {
 
     getUserDetails : [tokenValidator, async (req,res) => {
-        console.log(req.authorization_tier)
         if(req.authorization_tier == "ADMIN"){
 
         if(req.params.userName == undefined)
@@ -178,7 +177,6 @@ const validator = require('validator');
 
 
      adminLogin : async (req, res) => {
-        console.log("username = " + req.body.userName);
         if(req.body.userName == undefined || req.body.password == undefined)
         {
             res.status(400).send({error : "We are one step ahead! Try harder!"});
@@ -213,7 +211,6 @@ const validator = require('validator');
             }
             
             catch(err){
-                console.log(err);
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
@@ -233,7 +230,6 @@ const validator = require('validator');
 
     registeredUsers : [tokenValidator, async (req,res) => {
 
-        console.log(req.params.eventId);
         if(req.params.eventId == undefined || !validator.isNumeric(req.params.eventId))
 
         {
