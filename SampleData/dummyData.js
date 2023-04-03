@@ -47,12 +47,13 @@ const insertDummyData = (db, transactions_db) => {
         db.query(`insert into CrewDetails (teamName) values ('TEAM${i}')`);
         db.query(`insert into UserData (userEmail, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values ('cb.en.u4cse2001${i}@cb.students.amrita.edu', 'FIRSTNAME${i} LASTNAME${i}', 'SAFEPASSWORD${i}', ${!bool_data}, ${bool_data}, ${bool_data}, ${i + 1},'${date_time}','PASSPORTID${i}', '${date_time}')`);
         db.query(`insert into CrewMembers (crewEmail, name, departmentAbbr, teamId, role) values ('someEmail${i}@gmail.com', 'NAME${i}', 'DEP${i}', ${i+1}, 'SOMEROLE${i}')`);
-        db.query(`insert into StarredEvents (eventId, userEmail) values (${i+1}, 'cb.en.u4cse2001${i}@cb.students.amrita.edu')`);
+        db.query(`insert into EventData (eventName, eventOrWorkshop, groupOrIndividual, maxCount, description, userName, date, eventTime, venue, fees, totalNumberOfSeats, noOfRegistrations, timeStamp, refundable, departmentAbbr) values ('EVENT${i}', ${bool_data}, ${bool_data}, 1, 'DESC${i}', 'ADMIN_538865', '24-Mar-2023', '08:14:57', 'VENUE${i}', 100, 100, 0, '${date_time}', 0,  'DEP${i}')`)
         db.query(`insert into GroupData (groupId, userEmail, teamName, role, eventId) values ('UUID${i}', 'cb.en.u4cse2001${i}@cb.students.amrita.edu', 'TEAM NAME ${i}', 'ROLE ${i}', ${i + 1})`);
-        db.query(`insert into RegisteredEvents (userEmail,eventId,timeStamp,refundRequested) values ('cb.en.u4cse2001${i}@cb.students.amrita.edu',${i+1},'${date_time}',${bool_data})`);
        transactions_db.query(`insert into Transactions (transactionId, userEmail, sender, senderAccNo, receiver, receiverAccNo, eventIdOrPassportId, amount, timeStamp) values ('TRANSACTIONID${i}', 'cb.en.u4cse2001${i}@cb.students.amrita.edu', 'SENDER${i}', 'SENDERACC${i}', 'RECNAME${i}', 'RECACC${i}', 'SOMEID${i}', ${200 + i * i}, '${date_time}')`);
-
-    }
+        db.query(`insert into StarredEvents (eventId, userEmail) values (${i+1}, 'cb.en.u4cse2001${i}@cb.students.amrita.edu')`);
+        db.query(`insert into RegisteredEvents (userEmail,eventId,timeStamp,refundRequested) values ('cb.en.u4cse2001${i}@cb.students.amrita.edu',${i+1},'${date_time}',${bool_data})`);
+   
+}
     
 }
 
