@@ -15,6 +15,7 @@ async function tokenValidator(req, res, next){
         const payload = await verify(token, publicKey);
         if(payload["secret_key"] == secret_key)
         {
+            req.authorization_tier = payload["role"];
             next();
             return;
         }
@@ -27,7 +28,7 @@ async function tokenValidator(req, res, next){
     }
     catch(error)
     {
-        res.status(401).send({"error" : "Unauthorized access"});
+        res.status(401).send({"error" : "Invalid Token"});
         return;
     }
     

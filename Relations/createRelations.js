@@ -9,6 +9,15 @@ const createTables = (db) => {
         }
     });
 
+    db.query("create table Roles (role varchar(10) primary key)", (err, res)=>{
+        if(err) {
+            console.log("Failed to create Roles table");
+        }
+        else {
+            console.log("Roles table created succesfully");  
+        }
+    })
+
     
 
     db.query("create table OTP (userEmail varchar(65) primary key, otp int unique not null, fullName VARCHAR(50) NOT NULL, password VARCHAR(25) NOT NULL, currentStatus BOOLEAN NOT NULL, activePassport BOOLEAN NOT NULL, isAmritaCBE BOOLEAN NOT NULL, collegeId INT NOT NULL, accountTimeStamp timestamp NOT NULL, passportId VARCHAR(25) UNIQUE, passportTimeStamp timestamp);", (err, res) => {
@@ -21,7 +30,7 @@ const createTables = (db) => {
         }
     });
 
-    db.query("create table EventManager (eventManagerEmail varchar(65) PRIMARY KEY,name varchar(50) NOT NULL,password varchar(25) NOT NULL,timeStamp timestamp NOT NULL,managerPhoneNumber char(10) NOT NULL unique)",(err,result) => {
+    db.query("create table EventManager (userName varchar(65) PRIMARY KEY,name varchar(50) NOT NULL,password varchar(25) NOT NULL,timeStamp timestamp NOT NULL,phoneNumber char(10) NOT NULL unique, role varchar(10), foreign key(role) references Roles(role))",(err,result) => {
         if(err) {
             console.log("Failed to create ErrorManager table");
         }
@@ -81,7 +90,7 @@ const createTables = (db) => {
 
     
 
-    db.query("create table EventData (eventId int PRIMARY KEY AUTO_INCREMENT, eventName varchar(50) NOT NULL,eventOrWorkshop boolean NOT NULL, groupOrIndividual bool NOT NULL, maxCount int NOT NULL, description varchar(500) NOT NULL,eventManagerEmail varchar(65) not null,date varchar(20) NOT NULL,eventTime time NOT NULL,venue varchar(50) NOT NULL,fees int NOT NULL,totalNumberOfSeats int NOT NULL,noOfRegistrations int NOT NULL,timeStamp timestamp NOT NULL,refundable boolean NOT NULL,departmentAbbr varchar(10) not null,FOREIGN KEY(departmentAbbr) REFERENCES DepartmentData(departmentAbbr),FOREIGN KEY(eventManagerEmail) REFERENCES EventManager(eventManagerEmail))", (err,result) => {
+    db.query("create table EventData (eventId int PRIMARY KEY AUTO_INCREMENT, eventName varchar(50) NOT NULL,eventOrWorkshop boolean NOT NULL, groupOrIndividual bool NOT NULL, maxCount int NOT NULL, description varchar(500) NOT NULL,userName varchar(65) not null,date varchar(20) NOT NULL,eventTime time NOT NULL,venue varchar(50) NOT NULL,fees int NOT NULL,totalNumberOfSeats int NOT NULL,noOfRegistrations int NOT NULL,timeStamp timestamp NOT NULL,refundable boolean NOT NULL,departmentAbbr varchar(10) not null,FOREIGN KEY(departmentAbbr) REFERENCES DepartmentData(departmentAbbr),FOREIGN KEY(userName) REFERENCES EventManager(userName))", (err,result) => {
         if(err) {
             console.log("Failed to create EventData table");
         }
@@ -107,6 +116,8 @@ const createTables = (db) => {
             console.log("StarredEvents table created succesfully");  
         }
     })
+
+    
 
 
     
