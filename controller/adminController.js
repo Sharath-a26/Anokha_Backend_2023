@@ -328,7 +328,25 @@ const validator = require('validator');
     }
     }],
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     verifyUser : [tokenValidator,async (req,res) => {
+
+        if(req.authorization_tier == "SECURITY")
+        {
         
         if(req.params.userEmail == undefined) {
             res.sendStatus(400).send("URL not found")
@@ -362,7 +380,11 @@ const validator = require('validator');
 
             finally{
                 await db_connection.release();
-            }    
+            } 
+        }
+        else{
+            res.status(401).send({"error" : "You have no rights to be here!"})
+        }   
         
     }]
     
