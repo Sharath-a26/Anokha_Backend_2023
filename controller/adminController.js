@@ -213,6 +213,7 @@ const validator = require('validator');
             }
             
             catch(err){
+                console.log(err);
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
