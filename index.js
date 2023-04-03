@@ -8,7 +8,7 @@ const cluster = require('cluster');
 const { pid } = require('process');
 const insertDummyData = require('./SampleData/dummyData');
 const server = express()
-
+const cors = require('cors');
 const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
 const userWebRouter = require('./routes/userWeb.js');
@@ -24,6 +24,7 @@ const PORT = 3000;
 
     server.use(helmet())
     server.use(express.json());
+    server.use(cors());
     
      //Routes
     server.use('/userApp', userAppRouter);
