@@ -13,7 +13,7 @@ const validator = require('validator');
             res.status(400).send({error : "We are one step ahead! Try harder!"});
         }
         else{
-         let sql_q = `select * from AnokhaEventManager where userName = ?`;
+         let sql_q = `select * from EventManager where userName = ?`;
          const db_connection = await db.promise().getConnection();
          try{
             const [result] = await db_connection.query(sql_q, [req.params.userName]);

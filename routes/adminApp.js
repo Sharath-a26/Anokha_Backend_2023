@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controller/adminController');
 
-router.get("/getAdmin/:adminEmail",adminController.getUserDetails);
+router.get("/getAdmin/:userName",adminController.getUserDetails);
 router.post("/getEventDetails/:userName", adminController.getEventDetails);
 router.post("/event/createEvent", adminController.createEvent);
 router.post("/login", adminController.adminLogin);

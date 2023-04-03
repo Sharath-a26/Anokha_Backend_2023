@@ -184,3 +184,6 @@ Error: View 'anokha.anokhaeventdata' references invalid table(s) or column(s) or
 2023-04-03 14:24:04
 Error: View 'anokha.anokhaeventdata' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
 
+2023-04-03 15:16:26
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
