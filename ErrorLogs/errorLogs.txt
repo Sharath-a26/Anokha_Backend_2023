@@ -151,3 +151,30 @@ Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s)
 2023-04-03 00:08:04
 Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
 
+2023-04-03 13:14:47
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
+2023-04-03 13:15:30
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
+2023-04-03 13:15:37
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
+2023-04-03 13:15:42
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
+2023-04-03 13:15:48
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
+2023-04-03 13:16:52
+2023-04-03 13:17:13
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
+2023-04-03 13:17:46
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
+2023-04-03 13:19:55
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
