@@ -322,7 +322,7 @@ const validator = require('validator');
     }
     }],
 
-    getUserDetails : [tokenValidator,async (req,res) => {
+    verifyUser : [tokenValidator,async (req,res) => {
         
         if(req.params.userEmail == undefined) {
             res.sendStatus(400).send("URL not found")
