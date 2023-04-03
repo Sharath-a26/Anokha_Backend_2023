@@ -9,6 +9,8 @@ router.post("/login", adminController.adminLogin);
 router.get('/getRegisteredUsers/:eventId',adminController.registeredUsers);
 router.post('/events/updateEvent', adminController.updateEventData);
 
+//router.post('/addStudentCoordinator')
+
 //for the security 
 router.get('/verifyUser/:userEmail',adminController.verifyUser);
 

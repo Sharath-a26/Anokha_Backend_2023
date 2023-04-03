@@ -1,5 +1,28 @@
 const dropTables = (db) => {
 
+    db.query("drop table StudentCoordinator", (err, result)=>{
+        if(err)
+        {
+            console.log("StudentCoordinator Relation doesnot exist. Failed to drop...");
+            
+        }
+        else{
+            console.log("Succesfully dropped relation StudentCoordinator");
+        }
+    })
+
+    db.query("drop table VisitsData", (err, result)=>{
+        if(err)
+        {
+            console.log("VisitsData Relation doesnot exist. Failed to drop...");
+            
+        }
+        else{
+            console.log("Succesfully dropped relation VisitsData");
+        }
+    })
+
+
     db.query("drop table StarredEvents",  (err, result) => {
         if(err)
         {

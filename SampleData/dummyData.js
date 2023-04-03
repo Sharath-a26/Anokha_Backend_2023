@@ -52,10 +52,14 @@ const insertDummyData = (db, transactions_db) => {
        transactions_db.query(`insert into Transactions (transactionId, userEmail, sender, senderAccNo, receiver, receiverAccNo, eventIdOrPassportId, amount, timeStamp) values ('TRANSACTIONID${i}', 'cb.en.u4cse2001${i}@cb.students.amrita.edu', 'SENDER${i}', 'SENDERACC${i}', 'RECNAME${i}', 'RECACC${i}', 'SOMEID${i}', ${200 + i * i}, '${date_time}')`);
         db.query(`insert into StarredEvents (eventId, userEmail) values (${i+1}, 'cb.en.u4cse2001${i}@cb.students.amrita.edu')`);
         db.query(`insert into RegisteredEvents (userEmail,eventId,timeStamp,refundRequested) values ('cb.en.u4cse2001${i}@cb.students.amrita.edu',${i+1},'${date_time}',${bool_data})`);
-   
+        db.query(`insert into VisitsData (userEmail, entryTimeStamp, exitTimeStamp, inside) values ('cb.en.u4cse2001${i}@cb.students.amrita.edu', '${date_time}', null, 1)`);
+
 }
+db.query(`insert into StudentCoordinator (faculty, student) values ('FACCOORD_738865', 'STUDENTCOORD_738865')`)
+
     
 }
+
 
 module.exports = insertDummyData;
 

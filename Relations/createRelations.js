@@ -30,7 +30,7 @@ const createTables = (db) => {
         }
     });
 
-    db.query("create table EventManager (userName varchar(65) PRIMARY KEY,name varchar(50) NOT NULL,password varchar(25) NOT NULL,timeStamp timestamp NOT NULL,phoneNumber char(10) NOT NULL unique, role varchar(10), foreign key(role) references Roles(role))",(err,result) => {
+    db.query("create table EventManager (userName varchar(65) PRIMARY KEY,name varchar(50) NOT NULL,password varchar(25) NOT NULL,timeStamp timestamp NOT NULL,phoneNumber char(10) NOT NULL unique, role varchar(10), departmentAbbr varchar(10), foreign key(role) references Roles(role), foreign key(departmentAbbr) references DepartmentData(departmentAbbr))",(err,result) => {
         if(err) {
             console.log("Failed to create ErrorManager table");
         }
@@ -114,6 +114,28 @@ const createTables = (db) => {
         }
         else {
             console.log("StarredEvents table created succesfully");  
+        }
+    })
+
+    db.query("create table VisitsData (userEmail varchar(65), entryTimeStamp timestamp, exitTimeStamp timestamp, inside boolean, foreign key (userEmail) references UserData(userEmail))", (err, res)=>{
+        if(err)
+        {
+            console.log("Failed to create VisitsData table");
+
+        }
+        else{
+            console.log("VisitsData table created succesfully");  
+        }
+    })
+
+    db.query("create table StudentCoordinator (faculty varchar(65), student varchar(65), primary key(faculty, student), foreign key(faculty) references EventManager(userName), foreign key(student) references EventManager(userName))", (err, res) =>{
+        if(err)
+        {
+            console.log("Failed to create StudentCoordinator table");
+
+        }
+        else{
+            console.log("StudentCoordinator table created succesfully");  
         }
     })
 
