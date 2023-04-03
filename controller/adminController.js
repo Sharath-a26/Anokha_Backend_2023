@@ -320,12 +320,15 @@ const validator = require('validator');
     }
     }],
 
-    getUserDetails : [tokenValidator,(req,res) => {
+    getUserDetails : [tokenValidator,async (req,res) => {
         
         if(req.params.userEmail == undefined) {
             res.sendStatus(400).send("URL not found")
         }
+        const db_connection = await db.promise().getConnection();
         let sql_q = `select * from userData where userEmail = ?`;
+
+        try {
         db.query(sql_q,[req.params.userEmail],(err,result) => {
             if(err) {
                 res.send("Error");
@@ -335,6 +338,23 @@ const validator = require('validator');
             }
             
         })
+    }
+
+
+    catch(err)
+            {
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                res.status(500).send({error : "Query Error"})
+            }
+
+            finally{
+                await db_connection.release();
+            }    
         
     }]
     
