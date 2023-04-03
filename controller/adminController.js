@@ -52,11 +52,11 @@ const validator = require('validator');
         parameters = []
         if(req.body.eventDate == undefined && req.params.userName != undefined)
         {
-            sql_q = `select * from AnokhaEventData where userName = ?`;
+            sql_q = `select * from EventData where userName = ?`;
             parameters = [req.params.userName]
         }
         else if (req.params.userName != undefined){
-            sql_q = `select * from AnokhaEventData where userName = ? and date = ?`;
+            sql_q = `select * from EventData where userName = ? and date = ?`;
             parameters = [req.params.userName,req.body.eventDate]
         }
         else{
