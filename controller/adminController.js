@@ -232,16 +232,15 @@ const validator = require('validator');
 
 
     registeredUsers : [tokenValidator, async (req,res) => {
-        if(req.params.eventName == undefined)
+        if(req.params.eventId == undefined)
         {
             res.status(400).send({error : "We are one step ahead! Try harder!"});
         }
         else{
-        let sql = `select * from userData where userEmail in (select userEmail from registeredevents where eventId in 
-            (select eventId from eventData where eventName = ?));`
+        let sql = `select * from anokhaeventregisteredstudents where eventId = ?`
         const db_connection = await db.promise().getConnection();
         try{
-            const [result] = await db_connection.query(sql, [req.params.eventName]);
+            const [result] = await db_connection.query(sql, [req.params.eventId]);
             res.status(200).send(result);
         }
         catch(err)
