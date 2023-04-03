@@ -320,6 +320,24 @@ const validator = require('validator');
             }
         
     }
+    }],
+
+    getUserDetails : [tokenValidator,(req,res) => {
+        
+        if(req.params.userEmail == undefined) {
+            res.sendStatus(400).send("URL not found")
+        }
+        let sql_q = `select * from userData where userEmail = ?`;
+        db.query(sql_q,[req.params.userEmail],(err,result) => {
+            if(err) {
+                res.send("Error");
+            }
+            else {
+                res.send(result);
+            }
+            
+        })
+        
     }]
     
 }
