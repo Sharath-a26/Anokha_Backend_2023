@@ -12,7 +12,7 @@ const server = express()
 const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
 const userWebRouter = require('./routes/userWeb.js');
-const adminWebRouter = require('./routes/adminWeb');
+const adminWebRouter = require('./routes/adminWeb.js');
 const {generateKey, generateTransactionKey} = require('./AssymetricKeyPair/key');
 const createViews = require('./ViewGenerator/views.js');
 const establishConnection = require('./initializeConnection.js');
@@ -28,8 +28,8 @@ const PORT = 3000;
      //Routes
     server.use('/userApp', userAppRouter);
     server.use('/adminApp', adminAppRouter);
-    //server.use('/userWeb',userWebRouter);
-    //server.use('/adminWeb',adminWebRouter);
+    server.use('/userWeb',userWebRouter);
+    server.use('/adminWeb',adminWebRouter);
 
  
 
