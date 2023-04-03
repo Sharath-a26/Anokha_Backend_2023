@@ -145,3 +145,9 @@ TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
 TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
 
 2023-04-02 15:31:23
+2023-04-03 00:07:32
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
+2023-04-03 00:08:04
+Error: View 'anokha.anokhaeventmanager' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+

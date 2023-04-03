@@ -1,5 +1,42 @@
 const insertDummyData = (db, transactions_db) => {
     var bool_data = false;
+
+    db.query(`insert into Roles (role) values ("ADMIN")`);
+    db.query(`insert into Roles (role) values ("EWHEAD")`);
+    db.query(`insert into Roles (role) values ("FINANCE")`);
+    db.query(`insert into Roles (role) values ("DEPTHEAD")`);
+    db.query(`insert into Roles (role) values ("FACCOORD")`);
+    db.query(`insert into Roles (role) values ("STDCOORD")`);
+    db.query(`insert into Roles (role) values ("EVNTDREG")`);
+    db.query(`insert into Roles (role) values ("SECURITY")`);
+    //ADMIN ==> All data with all regsieterd users
+    //EWHEAD ==> All data from that event 
+    //DEPTHEAD ==> All department related events
+    //FACCOORD ==> Particular event
+    //STUDENTCOORD ==> Particular coordinator
+    //EVENTIDEREG ==> registration for eventide
+    //SECURITY ==> Scanning
+    //FINANCE ==> Statistics
+    var date_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
+    db.query(`insert into EventManager (userName,name,password,timeStamp,phoneNumber,role) values ('ADMIN_538865','ADMIN1','ADMINPASSWORD1','${date_time}','1234567890','ADMIN')`); 
+    db.query(`insert into EventManager (userName,name,password,timeStamp,phoneNumber,role) values ('ADMIN_538867','ADMIN2','ADMINPASSWORD2','${date_time}','1234567891','ADMIN')`); 
+    db.query(`insert into EventManager (userName,name,password,timeStamp,phoneNumber,role) values ('ADMIN_638866','EWHEAD2','ADMINPASSWORD1','${date_time}','1234567893','EWHEAD')`); 
+    db.query(`insert into EventManager (userName,name,password,timeStamp,phoneNumber,role) values ('EWHEAD_638865','EWHEAD1','EWHEADPASSWORD1','${date_time}','1234567895','EWHEAD')`); 
+    db.query(`insert into EventManager (userName,name,password,timeStamp,phoneNumber,role) values ('DEPTHEAD_738865','DEPTHEAD1','DEPTHEADPASSWORD1','${date_time}','1234567296', 'DEPTHEAD')`); 
+    db.query(`insert into EventManager (userName,name,password,timeStamp,phoneNumber,role) values ('FACCOORD_738865','FACCOORD1','FACCOORDPASSWORD1','${date_time}','1234527897', 'FACCOORD')`); 
+    db.query(`insert into EventManager (userName,name,password,timeStamp,phoneNumber,role) values ('STUDENTCOORD_738865','STUDENTCOORD1','STUDENTCOORDPASSWORD1','${date_time}','1214527898', 'STDCOORD')`); 
+    db.query(`insert into EventManager (userName,name,password,timeStamp,phoneNumber,role) values ('EVENTIDEREG_738865','EVENTIDEREG1','EVENTIDEREGPASSWORD1','${date_time}','1215452789', 'EVNTDREG')`); 
+    db.query(`insert into EventManager (userName,name,password,timeStamp,phoneNumber,role) values ('SECURITY_738865','SECURITY1','SECURITYPASSWORD1','${date_time}','121645279', 'SECURITY')`); 
+    db.query(`insert into EventManager (userName,name,password,timeStamp,phoneNumber,role) values ('FINANCE_738865','FINANCE1','FINANCEPASSWORD1','${date_time}','129645890', 'FINANCE')`); 
+
+
+
+
+
+
+
+
+
     for(var i = 0; i<=9; i+=1)
     {
         
@@ -8,9 +45,6 @@ const insertDummyData = (db, transactions_db) => {
         db.query(`insert into DepartmentData (departmentAbbr, departmentName) values ('DEP${i}', 'DEPARTMENT${i}')`);
         db.query(`insert into CollegeData (collegeName, district, state, country) values ('COLLEGE${i}', 'DISTRICT${i}', 'STATE${i}', 'COUNTRY${i}')`);
         db.query(`insert into CrewDetails (teamName) values ('TEAM${i}')`);
-        db.query(`insert into EventManager (eventManagerEmail,name,password,timeStamp,managerPhoneNumber) values ('managerEmail${i}@gmailc.com','managerName${i}','managerPass${i}','${date_time}','123456789${i}')`); 
-        db.query(`insert into EventData (eventName,eventOrWorkshop,departmentAbbr,groupOrIndividual,maxCount,description,eventManagerEmail,date,eventTime,venue,fees,totalNumberOfSeats,noOfRegistrations,timeStamp,refundable) values ('EVENT${i}','${i%2}','DEP${i}',${i%2},${1},'DESCRIPTION${i}','managerEmail${i}@gmailc.com', '27-Mar-2023', '${i}0:00:00','VENUE${i}',${(i+1)*100},${i+50},${i+10},'${date_time}',${bool_data})`);
-       
         db.query(`insert into UserData (userEmail, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values ('cb.en.u4cse2001${i}@cb.students.amrita.edu', 'FIRSTNAME${i} LASTNAME${i}', 'SAFEPASSWORD${i}', ${!bool_data}, ${bool_data}, ${bool_data}, ${i + 1},'${date_time}','PASSPORTID${i}', '${date_time}')`);
         db.query(`insert into CrewMembers (crewEmail, name, departmentAbbr, teamId, role) values ('someEmail${i}@gmail.com', 'NAME${i}', 'DEP${i}', ${i+1}, 'SOMEROLE${i}')`);
         db.query(`insert into StarredEvents (eventId, userEmail) values (${i+1}, 'cb.en.u4cse2001${i}@cb.students.amrita.edu')`);

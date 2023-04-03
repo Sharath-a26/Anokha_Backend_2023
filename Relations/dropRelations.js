@@ -116,6 +116,17 @@ const dropTables = (db) => {
         }
     });
 
+    db.query("drop table Roles", (err, result) => {
+        if(err)
+        {
+            console.log("Roles Relation doesnot exist. Failed to drop...");
+            
+        }
+        else{
+            console.log("Succesfully dropped relation Roles");
+        }
+    });
+
 
 
     db.query("drop table DepartmentData",  (err, result) => {

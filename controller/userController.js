@@ -178,6 +178,7 @@ module.exports = {
                     collegeName : result[0].collegeName,
                     district : result[0].district,
                     country : result[0].country,
+                    role : "USER"
                 });
                 res.json({
                     
