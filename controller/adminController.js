@@ -232,7 +232,7 @@ const validator = require('validator');
 
 
     registeredUsers : [tokenValidator, async (req,res) => {
-        if(req.params.eventId == undefined || !validator.isNumeric(req.params.eventId))
+        if(req.params.eventName == undefined || !validator.isNumeric(req.params.eventName))
         {
             res.status(400).send({error : "We are one step ahead! Try harder!"});
         }
