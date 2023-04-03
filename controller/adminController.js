@@ -5,10 +5,10 @@ const fs = require('fs');
 const validator = require('validator');
  module.exports = {
 
-     getAdminDetails : [tokenValidator, async (req,res) => {
+    getUserDetails : [tokenValidator, async (req,res) => {
         console.log(req.authorization_tier)
         if(req.authorization_tier == "ADMIN"){
-            
+
         if(req.params.userName == undefined)
         {
             res.status(400).send({error : "We are one step ahead! Try harder!"});
@@ -48,6 +48,7 @@ const validator = require('validator');
 
 
      getEventDetails : [tokenValidator, async(req, res) => {
+        if(req.authorization_tier == "ADMIN" || req.authorization_tier == "ADMIN"){
         var sql_q = "";
         parameters = []
         if(req.body.eventDate == undefined && req.params.userName != undefined)
@@ -87,6 +88,11 @@ const validator = require('validator');
          finally{
             await db_connection.release();
          }
+        }
+        else{
+            res.status(401).send({"error" : "You have no rights to be here!"})
+        }
+
         
      }],
 
