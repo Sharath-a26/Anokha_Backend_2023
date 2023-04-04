@@ -434,7 +434,7 @@ const { log } = require('console');
             else {
                 
                 var entry;
-                let sql_entry = `select inside from visitsdata where userEmail = ? order by entryTimeStamp desc LIMIT 1;`;
+                let sql_entry = `select inside from visitsdata where userEmail = ? order by visit_id desc LIMIT 1;`;
                 db.query(sql_entry,[req.params.userEmail],(err,result_entry) => {
                     if(err) {
                         console.log(err);
@@ -458,9 +458,7 @@ const { log } = require('console');
                 else {
                     console.log("hello");
                     inside = 1 - entry[0]["inside"]
-                }
-                
-                var params;
+                    var params;
                 if(inside == 1) {
                     params = [req.params.userEmail,dateTime,null,inside];
                 }
@@ -471,13 +469,16 @@ const { log } = require('console');
                 db.query(sql2,params,(err,result2) => {
                     if(err || result2.affectedRows == 0) {
                         console.log(err);
-                        res.send(null)
+                        res.send([])
                     }
                     else {
                         
                         res.send(result);
                     }
                 });
+                }
+                
+                
                     }
                 })
 
