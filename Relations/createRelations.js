@@ -40,7 +40,7 @@ const createTables = (db) => {
     });
 
 
-    db.query("create table CollegeData (collegeId int PRIMARY KEY AUTO_INCREMENT,collegeName varchar(50) NOT NULL,district varchar(50) NOT NULL,state varchar(50) NOT NULL,country varchar(50) NOT NULL)", (err,result) => {
+    db.query("create table CollegeData (collegeId int PRIMARY KEY AUTO_INCREMENT, universityName varchar(200) NOT NULL, collegeName varchar(300) NOT NULL,district varchar(50) NOT NULL,state varchar(50) NOT NULL,country varchar(50) NOT NULL)", (err,result) => {
         if(err) {
             console.log("Failed to create CollegeData table")
         }
