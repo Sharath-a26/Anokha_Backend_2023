@@ -8,7 +8,7 @@ async function createToken(data) {
     const privateKey = fs.readFileSync('./AssymetricKeyPair/private_key.pem');
     var token = "";
    
-    token = await sign(data, privateKey, { expiresIn: "10 m" });  
+    token = await sign(data, privateKey, { expiresIn: "20 m" });  
     
     return token;
 }
