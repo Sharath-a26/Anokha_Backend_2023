@@ -205,3 +205,48 @@ Error: Duplicate entry 'kvaisakhkrishnan@gmail.com' for key 'eventmanager.userEm
 Error: Cannot add or update a child row: a foreign key constraint fails (`anokha`.`eventmanager`, CONSTRAINT `eventmanager_ibfk_1` FOREIGN KEY (`role`) REFERENCES `roles` (`role`))
 
 2023-04-04 01:16:34
+2023-04-04 13:31:24
+ReferenceError: tokenGenerator is not defined
+
+ReferenceError: tokenGenerator is not defined
+
+2023-04-04 13:31:31
+ReferenceError: tokenGenerator is not defined
+
+2023-04-04 13:32:11
+2023-04-04 13:32:36
+ReferenceError: tokenGenerator is not defined
+
+2023-04-04 13:32:38
+ReferenceError: tokenGenerator is not defined
+
+2023-04-04 13:45:40
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-04 13:46:00
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-04 13:46:27
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-04 13:47:54
+2023-04-04 13:49:01
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-04 13:49:03
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-04 13:49:29
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-04 13:51:44
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-04 13:51:46
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+
+2023-04-04 13:53:02
+TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
+

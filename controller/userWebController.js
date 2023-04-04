@@ -37,7 +37,7 @@ module.exports = {
 
 
     userLogin : async (req,res) => {
-        console.log(req.body);
+        
         if(req.body.userEmail != undefined && req.body.password != undefined && !validator.isEmpty(req.body.userEmail) && !validator.isEmpty(req.body.password) && validator.isEmail(req.body.userEmail)){
         
             let db_connection = await db.promise().getConnection();
@@ -52,7 +52,7 @@ module.exports = {
                 }
                 else{
     
-                    const token = await tokenGenerator({
+                    const token = await webtokenGenerator({
                         userEmail : result[0].userEmail,
                         fullName : result[0].fullName,
                         collegeName : result[0].collegeName,
@@ -78,6 +78,7 @@ module.exports = {
             }
             catch(err)
             {
+                console.log(err);
                 const now = new Date();
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);

@@ -5,6 +5,7 @@ const fs = require('fs');
 const rn = require('random-number');
 const validator = require('validator');
 const mailer = require('../Mailer/adminAppUser.js');
+const { log } = require('console');
  module.exports = {
 
 
@@ -425,15 +426,67 @@ const mailer = require('../Mailer/adminAppUser.js');
         let sql_q = `select * from userData where userEmail = ?`;
 
         try {
+            var a = null;
         db.query(sql_q,[req.params.userEmail],(err,result) => {
             if(err) {
                 res.send("Error");
             }
             else {
-                res.send(result);
+                
+                var entry;
+                let sql_entry = `select inside from visitsdata where userEmail = ? order by entryTimeStamp desc LIMIT 1;`;
+                db.query(sql_entry,[req.params.userEmail],(err,result_entry) => {
+                    if(err) {
+                        console.log(err);
+                    }
+                    else {
+                    
+                    entry = result_entry;
+                     
+                let sql2 = `insert into visitsdata values(?,?,?,?)`;
+        
+                var today = new Date();
+                var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                var dateTime = date+' '+time;
+                var inside = 1;
+                
+               
+                if(entry.length == 0) {
+                    inside = 1;
+                }
+                else {
+                    console.log("hello");
+                    inside = 1 - entry[0]["inside"]
+                }
+                
+                var params;
+                if(inside == 1) {
+                    params = [req.params.userEmail,dateTime,null,inside];
+                }
+                else {
+                    params = [req.params.userEmail,null,dateTime,inside];
+                }
+                
+                db.query(sql2,params,(err,result2) => {
+                    if(err || result2.affectedRows == 0) {
+                        console.log(err);
+                        res.send(null)
+                    }
+                    else {
+                        
+                        res.send(result);
+                    }
+                });
+                    }
+                })
+
+               
+                
             }
             
         })
+
     }
 
 
