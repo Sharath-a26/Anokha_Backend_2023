@@ -18,6 +18,7 @@
   "homepage": "https://github.com/kvaisakhkrishnan/Anokha_Backend_2023#readme",
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "csrf": "^3.1.0",

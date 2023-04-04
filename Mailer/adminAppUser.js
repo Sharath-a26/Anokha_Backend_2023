@@ -4,8 +4,8 @@ const otpMailer = (fullName, userEmail, userName, password) => {
   var transporter = mailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'kvaisakhkrishnan@gmail.com',
-        pass: 'bzadotrblgcgcnac'
+      user: 'kvaisakhkrishnan@gmail.com',
+      pass: 'bzadotrblgcgcnac'
     }
 });
 

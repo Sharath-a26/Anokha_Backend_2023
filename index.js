@@ -17,6 +17,7 @@ const {generateKey, generateTransactionKey} = require('./AssymetricKeyPair/key')
 const createViews = require('./ViewGenerator/views.js');
 const establishConnection = require('./initializeConnection.js');
 
+
 const numberOfSlaves = 10;
 
 const PORT = 3000;
@@ -25,6 +26,7 @@ const PORT = 3000;
     server.use(helmet())
     server.use(express.json());
     server.use(cors());
+    
     
      //Routes
     server.use('/userApp', userAppRouter);

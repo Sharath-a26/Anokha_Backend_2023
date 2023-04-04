@@ -1,6 +1,6 @@
 const { db, transactions_db } = require('../connection');
-const tokenGenerator = require('../middleware/tokenGenerator');
-const tokenValidator = require('../middleware/tokenValidator');
+const tokenGenerator = require('../middleware/appTokenGenerator');
+const tokenValidator = require('../middleware/appTokenValidator');
 const fs = require('fs');
 const rn = require('random-number');
 const validator = require('validator');
@@ -259,9 +259,10 @@ const mailer = require('../Mailer/adminAppUser.js');
                 else{
 
                     const token = await tokenGenerator({
-                        userName : req.body.userName,
-                        name : result.fullName,
-                        managerPhoneNumber : result.managerPhoneNumber,
+                        userName : result.userName,
+                        userEmail : result.userEmail,
+                        name : result.name,
+                        managerPhoneNumber : result.phoneNumber,
                         role : result[0].role
                     });
                     res.json({
@@ -455,7 +456,22 @@ const mailer = require('../Mailer/adminAppUser.js');
             res.status(401).send({"error" : "You have no rights to be here!"})
         }   
         
-    }]
+    }],
+
+
+
+//     facultyAddsStudents : [tokenValidator, async (req, res) =>{
+//         if(req.authorization_tier == "FACCOORD"){
+//             if(req.userEmail == undefined ||
+//                 !validator.isEmail(req.userEmail) ||
+//                 //have to write code here.....
+//                 )
+            
+//     }
+// else{
+//     res.status(401).send({"error" : "You have no rights to be here!"})
+//     }
+//     }]
 
 
 

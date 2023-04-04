@@ -62,7 +62,7 @@ const insertDummyData = (db, transactions_db) => {
         db.query(`insert into VisitsData (userEmail, entryTimeStamp, exitTimeStamp, inside) values ('cb.en.u4cse2001${i}@cb.students.amrita.edu', '${date_time}', null, 1)`);
 
 }
-db.query(`insert into StudentCoordinator (faculty, student) values ('FACCOORD_738865', 'STUDENTCOORD_738865')`)
+db.query(`insert into StudentCoordinator (faculty, student, eventId) values ('FACCOORD_738865', 'STUDENTCOORD_738865', 2)`)
 
     
 }

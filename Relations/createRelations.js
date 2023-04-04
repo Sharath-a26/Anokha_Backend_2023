@@ -128,7 +128,7 @@ const createTables = (db) => {
         }
     })
 
-    db.query("create table StudentCoordinator (faculty varchar(65), student varchar(65), primary key(faculty, student), foreign key(faculty) references EventManager(userName), foreign key(student) references EventManager(userName))", (err, res) =>{
+    db.query("create table StudentCoordinator (faculty varchar(65), student varchar(65), eventId int, primary key(faculty, student, eventId), foreign key(faculty) references EventManager(userName), foreign key(student) references EventManager(userName), foreign key(eventId) references EventData(eventId))", (err, res) =>{
         if(err)
         {
             console.log("Failed to create StudentCoordinator table");

@@ -12,7 +12,7 @@ async function createToken(data) {
    
     }
     else {
-         token = await sign(data, privateKey, { expiresIn: "10 m" });  
+         token = await sign(data, privateKey, { expiresIn: "60 m" });  
     }
     return token;
 }

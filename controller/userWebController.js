@@ -1,7 +1,7 @@
 const { db, transactions_db } = require('../connection');
 
-const tokenGenerator = require('../middleware/tokenGenerator');
-const tokenValidator = require('../middleware/tokenValidator');
+const tokenGenerator = require('../middleware/webTokenGenerator');
+const tokenValidator = require('../middleware/webTokenValidator');
 const otpTokenGenerator = require('../middleware/otpTokenGenerator.js');
 const otpTokenValidator = require('../middleware/otpTokenValidator');
 const randonNumberGenerator = require('../OTPGenerator/otp');
