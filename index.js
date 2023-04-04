@@ -16,6 +16,7 @@ const adminWebRouter = require('./routes/adminWeb.js');
 const {generateKey, generateTransactionKey} = require('./AssymetricKeyPair/key');
 const createViews = require('./ViewGenerator/views.js');
 const establishConnection = require('./initializeConnection.js');
+const insertCollegeData = require('./SampleData/collegeData');
 
 
 const numberOfSlaves = 10;
@@ -42,17 +43,19 @@ const PORT = 3000;
         console.log(`Master ${process.pid} is running`);
 
         db = establishConnection();
+       
 
-        const initialize = () => {
+        const initializeStep1 = () => {
             //Drop command. Please be carefull!!
             dropTables(db[0]);
             dropTransactionTable(db[1]);
+
             //Creating tables. Please be careful!
             createTables(db[0]);  
             createTransactionTable(db[1]); 
             //Inserting Sample Data. Please be careful!
-            insertDummyData(db[0], db[1]);
-        
+
+            insertCollegeData(db[0]);
             createViews(db[0], db[1]);
         
             //Key Generator
@@ -61,10 +64,16 @@ const PORT = 3000;
         
             console.log("initialization Done...");
         }
+
+        const initializeStep2 = () =>{
+            insertDummyData(db[0], db[1]);
+            
+            console.log("initialization Done...");
+        }
         
         
             //Please be careful. Dont run this command if you have data in backend.
-            initialize();
+            //initialize();
       
         // Fork workers
         for (let i = 0; i < numberOfSlaves; i++) {

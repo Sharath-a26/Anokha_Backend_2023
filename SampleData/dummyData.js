@@ -1,4 +1,6 @@
 const insertDummyData = (db, transactions_db) => {
+
+
     var bool_data = false;
     db.query(`insert into Roles (role) values ("SUPER")`);
     db.query(`insert into Roles (role) values ("ADMIN")`);
@@ -50,7 +52,6 @@ const insertDummyData = (db, transactions_db) => {
         var date_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
         bool_data = !bool_data;
         db.query(`insert into DepartmentData (departmentAbbr, departmentName) values ('DEP${i}', 'DEPARTMENT${i}')`);
-        db.query(`insert into CollegeData (collegeName, district, state, country) values ('COLLEGE${i}', 'DISTRICT${i}', 'STATE${i}', 'COUNTRY${i}')`);
         db.query(`insert into CrewDetails (teamName) values ('TEAM${i}')`);
         db.query(`insert into UserData (userEmail, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values ('cb.en.u4cse2001${i}@cb.students.amrita.edu', 'FIRSTNAME${i} LASTNAME${i}', 'SAFEPASSWORD${i}', ${!bool_data}, ${bool_data}, ${bool_data}, ${i + 1},'${date_time}','PASSPORTID${i}', '${date_time}')`);
         db.query(`insert into CrewMembers (crewEmail, name, departmentAbbr, teamId, role) values ('someEmail${i}@gmail.com', 'NAME${i}', 'DEP${i}', ${i+1}, 'SOMEROLE${i}')`);
@@ -62,7 +63,7 @@ const insertDummyData = (db, transactions_db) => {
         db.query(`insert into VisitsData (userEmail, entryTimeStamp, exitTimeStamp, inside) values ('cb.en.u4cse2001${i}@cb.students.amrita.edu', '${date_time}', null, 1)`);
 
 }
-db.query(`insert into StudentCoordinator (faculty, student, eventId) values ('FACCOORD_738865', 'STUDENTCOORD_738865', 2)`)
+// db.query(`insert into StudentCoordinator (faculty, student, eventId) values ('FACCOORD_738865', 'STUDENTCOORD_738865', 2)`)
 
     
 }
