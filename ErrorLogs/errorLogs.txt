@@ -256,3 +256,9 @@ Error: Unknown column 'userName' in 'where clause'
 Error: Unknown column 'ADMIN_538865' in 'where clause'
 
 2023-04-05 18:20:48
+2023-04-05 20:22:56
+Error: View 'anokha.anokhaeventdata' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+
+2023-04-05 20:23:35
+Error: View 'anokha.anokhaeventdata' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
+

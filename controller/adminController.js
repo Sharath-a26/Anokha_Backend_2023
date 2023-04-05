@@ -517,7 +517,76 @@ const { log } = require('console');
 //     }
 //     }]
 
+getAllEvents : [tokenValidator, async (req, res) => {
+    let db_connection = await db.promise().getConnection();
+    try{
+        const [result] = await db_connection.query(`select * from EventData`);
+        res.status(200).send(result);
+    }
+    catch(err)
+    {
+        console.log(err);
+        const now = new Date();
+        now.setUTCHours(now.getUTCHours() + 5);
+        now.setUTCMinutes(now.getUTCMinutes() + 30);
+        const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+        fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+        fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+        res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
 
+    }
+    finally{
+        await db_connection.release();
+    }
+}],
+
+getEventsByDept : [
+    tokenValidator,
+    async (req,res) => {
+        let db_connection = await db.promise().getConnection();
+        try{
+            const [result] = await db_connection.query(`select * from EventData where departmentAbbr = ?`,[req.params.dept]);
+            res.status(200).send(result);
+        }
+
+        catch(err) {
+            console.log(err);
+            const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+        }
+    }
+],
+
+getEventsByDate : [
+    tokenValidator,
+    async (req,res) => {
+        
+        let db_connection = await db.promise().getConnection();
+        try{
+            
+            const [result] = await db_connection.query(`select * from EventData where date = ?`,[req.params.date]);
+            res.status(200).send(result);
+        }
+
+        catch(err) {
+            console.log(err);
+            const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+        }
+
+
+    }
+]
 
     
 }
