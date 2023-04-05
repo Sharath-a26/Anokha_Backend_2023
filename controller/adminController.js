@@ -168,7 +168,7 @@ const { log } = require('console');
         if(req.body.eventName == undefined ||
             req.body.eventOrWorkshop == undefined ||
             req.body.description == undefined ||
-            req.body.userName == undefined ||
+            req.body.userEmail == undefined ||
             req.body.date == undefined ||
             req.body.eventTime == undefined ||
             req.body.venue == undefined ||
@@ -177,23 +177,10 @@ const { log } = require('console');
             req.body.departmentAbbr == undefined ||
             req.body.refundable == undefined ||
             req.body.groupOrIndividual == undefined ||
-            req.body.maxCount == undefined ||
-            !validatorisBoolean(req.body.groupOrIndividual) ||
-            !validator.isNumeric(req.body.maxCount) ||
-            validator.isEmpty(req.body.eventName) ||
-        !validator.isBoolean(req.body.eventOrWorkshop) ||
-        validator.isEmpty(req.body.description) ||
-        validator.isEmpty(req.body.date) ||
-        validator.isEmpty(req.body.eventTime) ||
-        validator.isEmpty(req.body.venue) ||
-        !validator.isNumeric(req.body.fees) ||
-        !validator.isNumeric(req.body.totalNumberOfSeats) ||
-        validator.isEmpty(req.body.departmentAbbr) ||
-        !validator.isBoolean(req.body.refundable) ||
-        req.body.url == undefined ||
-        !validator.isEmpty(req.body.url)
+            req.body.maxCount == undefined 
         )
         {
+           
             res.status(400).send({error : "We are one step ahead! Try harder!"});
         }
         else if(req.body.groupOrIndividual == 0 && req.body.maxCount != 0)
@@ -211,16 +198,18 @@ const { log } = require('console');
                 now.setUTCHours(now.getUTCHours() + 5);
                 now.setUTCMinutes(now.getUTCMinutes() + 30);
                 const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                let sql_q = `insert into EventData (eventName, eventOrWorkshop, groupOrIndividual, maxCount, description, url, userName, date, eventTime, venue, fees, totalNumberOfSeats, noOfRegistrations, timeStamp, refundable, departmentAbbr) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-                const [result] = await db_connection.query(sql_q, [req.body.eventName,req.body.eventOrWorkshop,req.body.groupOrIndividual, req.body.maxCount, req.body.description, req.body.url, req.body.userName,req.body.date,req.body.eventTime,req.body.venue,req.body.fees,req.body.totalNumberOfSeats,req.body.noOfRegistrations,req.body.timeStamp,req.body.refundable,req.body.departmentAbbr]);
+                let sql_q = `insert into EventData (eventName, eventOrWorkshop, groupOrIndividual, maxCount, description, url, userEmail, date, eventTime, venue, fees, totalNumberOfSeats, noOfRegistrations, timeStamp, refundable, departmentAbbr) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`;
+                const [result] = await db_connection.query(sql_q, [req.body.eventName,req.body.eventOrWorkshop,req.body.groupOrIndividual, req.body.maxCount, req.body.description, req.body.url, req.body.userEmail,req.body.date,req.body.eventTime,req.body.venue,req.body.fees,req.body.totalNumberOfSeats,req.body.noOfRegistrations,req.body.timeStamp,req.body.refundable,req.body.departmentAbbr]);
                 await db_connection.query(`SELECT RELEASE_LOCK(?)`, [lockName]);
                 res.status(201).send({result : "Data Inserted Succesfully"});
             }
         
             catch(err)
             {
+                console.log(err);
                 if(err.errno = 1452)
                 {
+
                     res.status(400).send({error : "Foreign Key Constraint Error"});
                 }
                 else{
