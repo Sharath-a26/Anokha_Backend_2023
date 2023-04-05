@@ -382,5 +382,47 @@ module.exports = {
         }
     
         }
+    ],
+
+    resetPass : [
+        webtokenValidator,
+        async (req,res) => {
+            if(validator.isEmpty(req.body.userEmail) || (validator.isEmpty(req.body.oldPassword)) || (validator.isEmpty(req.body.newPassword)) || !(validator.isEmail(req.body.userEmail))) 
+            {
+                res.status(400).send({error : "We are one step ahead! Try harder!"});
+                return;
+            }
+
+            else {
+                const db_connection = await db.promise().getConnection();
+            try{
+                let sql_q = `update userdata set password = ? where userEmail = ? and password = ?`;
+                const [results] = await db_connection.query(sql_q, [req.body.newPassword,req.body.userEmail,req.body.oldPassword]);
+
+                if(res.affectedRows == 0) {
+                    res.send("Error updating password");
+                }
+                else {
+                res.status(200).send("Updated Password Successfully");
+                }
+                }
+
+            catch(err) {
+                console.log(err);
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+            }
+
+            finally {
+                db_connection.release();
+              }
+            }
+        
+        }
     ]
 }

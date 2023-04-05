@@ -26,6 +26,9 @@ router.post('/registerUser', userWebController.registerUser);
 //verify otp
 router.post('/verifyOTP', userWebController.verifyOTP);
 
+// reset password
+router.post('/resetPass',userWebController.resetPass);
+
 module.exports = router;
 
 
