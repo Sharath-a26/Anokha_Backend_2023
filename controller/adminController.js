@@ -117,11 +117,11 @@ const { log } = require('console');
         parameters = []
         if(req.body.eventDate == undefined && req.params.userName != undefined)
         {
-            sql_q = `select * from EventData where userName = ?`;
+            sql_q = `select * from EventData where userEmail = (select userEmail from eventManager where userName = ?)`;
             parameters = [req.params.userName]
         }
         else if (req.params.userName != undefined){
-            sql_q = `select * from EventData where userName = ? and date = ?`;
+            sql_q = `select * from EventData where userName = (select userEmail from eventManager where userName = ?) and date = ?`;
             parameters = [req.params.userName,req.body.eventDate]
         }
         else{
@@ -141,6 +141,7 @@ const { log } = require('console');
         }
         catch(err)
          {
+            console.log(err);
             const now = new Date();
             now.setUTCHours(now.getUTCHours() + 5);
             now.setUTCMinutes(now.getUTCMinutes() + 30);

@@ -250,3 +250,9 @@ TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
 2023-04-04 13:53:02
 TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
 
+2023-04-05 18:13:48
+Error: Unknown column 'userName' in 'where clause'
+
+Error: Unknown column 'ADMIN_538865' in 'where clause'
+
+2023-04-05 18:20:48
