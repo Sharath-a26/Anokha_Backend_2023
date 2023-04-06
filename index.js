@@ -21,7 +21,7 @@ const insertCollegeData = require('./SampleData/collegeData');
 
 const numberOfSlaves = 10;
 
-const PORT = 3000;
+const PORT = 4000;
 
 
     server.use(helmet())

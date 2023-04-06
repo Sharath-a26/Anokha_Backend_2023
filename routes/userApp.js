@@ -17,4 +17,16 @@ router.post('/transaction/moveToTransaction', userController.moveToTransaction);
 router.post('/transaction/initiateTransaction', userController.initiateTransaction);
 
 
+
+
+router.post('/getTransactionData', userController.getTransactionData);
+
+router.get('/data', userController.trial)
+
+
+
+
+
+
+
 module.exports = router;

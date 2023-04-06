@@ -250,3 +250,6 @@ TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
 2023-04-04 13:53:02
 TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
 
+2023-04-05 12:50:55
+Error: Column 'currentStatus' cannot be null
+

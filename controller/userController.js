@@ -8,9 +8,58 @@ const mailer = require('../Mailer/otpGenerator');
 const welcomeMailer = require('../Mailer/welcomeMailer');
 const validator = require('validator');
 const fs = require('fs');
+const request = require('request');
 const transactionTokenGenerator = require('../middleware/transactionTokenGenerator');
 const transactionTokenVerifier = require('../middleware/transactionTokenVerifier');
+var crypto = require("crypto");
+const rn = require('random-number');
+const https = require('https');
+const querystring = require('querystring');
+var sha512 = require('sha512')
+
+const axios = require('axios');
+const { PassThrough } = require('stream');
+
+
+
+
+const { URLSearchParams } = require('url'); 
+const fetch = require('node-fetch'); 
+const encodedParams = new URLSearchParams(); 
+encodedParams.set('key','JP***g'); 
+encodedParams.set('amount','10.00'); 
+encodedParams.set('txnid','txnid91435566336'); 
+encodedParams.set('firstname','PayU User'); 
+encodedParams.set('email','test@gmail.com'); 
+encodedParams.set('phone','9876543210'); 
+encodedParams.set('productinfo','iPhone'); 
+encodedParams.set('surl','https://test-payment-middleware.payu.in/simulatorResponse'); 
+encodedParams.set('furl','https://test-payment-middleware.payu.in/simulatorResponse'); 
+encodedParams.set('pg','cc'); 
+encodedParams.set('bankcode','cc'); 
+encodedParams.set('ccnum','5123456789012346'); 
+encodedParams.set('ccexpmon','05'); 
+encodedParams.set('ccexpyr','2024'); 
+encodedParams.set('ccvv','123'); 
+encodedParams.set('ccname',''); 
+encodedParams.set('txn_s2s_flow','4'); 
+encodedParams.set('hash','89ac4e87106a1804a15fdc6efb1c32ca6d68592d65799dcc99b07b40e56684b1b31dec77cfd32c8d3436066fda7d547ea9b484ccb10670d96fd8f0cfeb97dbb0'); 
+
+
+
+
+
+var payumoney = require('payumoney_nodejs');
+  payumoney.setProdKeys("MERCHANT_KE", "MERCHANT_SALT", "PAYUMONEY_AUTHORIZATION_HEADER");
+  payumoney.setSandboxKeys("Pz9v2c", "TbxC2ph02lBUbVYwx0fIB50CvqL27pHo", "PAYUMONEY_AUTHORIZATION_HEADER");
+  payumoney.isProdMode(false); //set false for use of sandbox mode
+
+
+
+
 module.exports = {
+
+
 
 
     getEventsByDepartment : [tokenValidator, async (req, res) => {
@@ -230,8 +279,7 @@ module.exports = {
             validator.isEmpty(req.body.fullName)||
             validator.isEmpty(req.body.password)||
             validator.isEmpty(req.body.collegeId) ||
-            !validator.isEmail(req.body.userEmail) ||
-            !validator.isBoolean(req.body.collegeId))
+            !validator.isEmail(req.body.userEmail))
             
             {
                 res.status(400).send({error : "We are one step ahead! Try harder!"});
@@ -239,12 +287,12 @@ module.exports = {
             }
 
             else{
-                db.beginTransaction()
+               
 
                 db.query(`select * from AnokhaUserData where userEmail = ?`,[req.body.userEmail], (err, result) =>{
                     if(err)
                     {
-                        db.rollback()
+                       
                         const now = new Date();
                         now.setUTCHours(now.getUTCHours() + 5);
                          now.setUTCMinutes(now.getUTCMinutes() + 30);
@@ -254,7 +302,7 @@ module.exports = {
                         res.status(500).send({error : "Query Error... Contact DB Admin"});
                     }
                     else{
-                        db.commit()
+                      
                         if(result.length != 0)
                         {
                             res.status(409).send({"error" : "user already exists..."});
@@ -295,12 +343,12 @@ module.exports = {
                             now.setUTCMinutes(now.getUTCMinutes() + 30);
                             const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
 
-                            db.beginTransaction()
+
                             db.query(`delete from OTP where userEmail = ?`,[req.body.userEmail], (err, res) => {});
                             db.query(`insert into OTP (userEmail, otp, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,[req.body.userEmail,otpGenerated,req.body.fullName,req.body.password,req.body.currentStatus,0,isAmrita,req.body.collegeId,istTime,null,null], async (err, result)=> {
                                 if(err)
                                 {
-                                    db.rollback()
+                                    
                                     
                                     const now = new Date();
                                     now.setUTCHours(now.getUTCHours() + 5);
@@ -311,13 +359,13 @@ module.exports = {
                                     res.status(500).send({error : "Query Error... Contact DB Admin"});
                                 }
                                 else{
-                                    db.commit()
+                                   
                                     const token = await otpTokenGenerator({
                                         userEmail : req.body.userEmail,
                                         password : req.body.password
                                     });
                                     //sending OTP to user
-                                    mailer(req.body.fullName, req.body.userEmail, otpGenerated);
+                                   mailer (req.body.fullName, req.body.userEmail, otpGenerated);
                                     res.status(200).send({SECRET_TOKEN : token});
                                 }
                             });
@@ -648,6 +696,95 @@ module.exports = {
                 await db_connection.release();
             }
     }
-    }]
+    }],
+
+
+    
+
+
+
+    getTransactionData : async (req, res) => {
+        if(false && (req.body.productinfo == undefined ||
+            req.body.fullName == undefined ||
+            req.body.userEmail == undefined ||
+            req.body.phoneNumber == undefined ||
+            req.body.address == undefined ||
+            req.body.city == undefined ||
+            req.body.state == undefined ||
+            req.body.country == undefined ||
+            req.body.zipcode == undefined ||
+            req.body.firstName == undefined)
+
+            )
+            {
+                res.status(400).send({"error" : "Wohooooo..! Be careful.... If you are bad, I am your dad!"})
+            }
+            else{
+                
+                // Generate a unique transaction ID
+const txid = "ORD" + new Date().getTime();
+
+// Set up the payment parameters
+const amount = parseFloat("3.14");
+const key = "gtKFFx";
+const salt = "4R38IvwiV57FwVpsgOvTXBdLE4tHUXFW";
+const productinfo = req.body.productinfo;
+const firstName = req.body.firstName;
+const userEmail = req.body.userEmail;
+
+// Create the SHA512 hash of the payment parameters
+const text = key + "|" + txid + "|" + amount + "|" + productinfo + "|" + firstName + "|" + userEmail + "|||||||||||" + salt;
+const hash = crypto.createHash('sha512');
+hash.update(text);
+const hashedData = hash.digest('hex');
+console.log(text);
+console.log(hashedData);
+// Set up the payment data to be sent in the POST request
+const postData = querystring.stringify({
+ 'key' : key,
+ 'txnid' : txid,
+ 'amount' : amount,
+ 'firstname' : firstName,
+ 'email' : userEmail,
+ 'phone' : 9123412345,
+ 'productinfo' : productinfo,
+ 'pg' : 'UPI',
+ 'bankcode' : 'UPI',
+ "vpa" : "kvaisakhkrishnan@oksbi",
+ 'surl' : 'https://anoka.amrita.edu/api',
+ 'furl' : 'https://anoka.amrita.edu/api',
+'txn_s2s_flow' : 4,
+'hash' : hashedData
+});
+try{
+const payUUrl = 'https://test.payu.in/_payment';
+const response = await axios.post(payUUrl, postData);
+res.status(200).send(response.data);
+
+} catch (error) {
+res.status(500).send({error: error.message});
+}
+
+            }
+
+
+
+
+
+
+
+  
+  
+
+
+
+    },
+
+    trial : async(req, res) =>
+    {
+        console.log("OK");
+    }
+   
 
 }
+
