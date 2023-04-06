@@ -12,49 +12,6 @@ const request = require('request');
 const transactionTokenGenerator = require('../middleware/transactionTokenGenerator');
 const transactionTokenVerifier = require('../middleware/transactionTokenVerifier');
 var crypto = require("crypto");
-const rn = require('random-number');
-const https = require('https');
-const querystring = require('querystring');
-var sha512 = require('sha512')
-
-const axios = require('axios');
-const { PassThrough } = require('stream');
-
-
-
-
-const { URLSearchParams } = require('url'); 
-const fetch = require('node-fetch'); 
-const encodedParams = new URLSearchParams(); 
-encodedParams.set('key','JP***g'); 
-encodedParams.set('amount','10.00'); 
-encodedParams.set('txnid','txnid91435566336'); 
-encodedParams.set('firstname','PayU User'); 
-encodedParams.set('email','test@gmail.com'); 
-encodedParams.set('phone','9876543210'); 
-encodedParams.set('productinfo','iPhone'); 
-encodedParams.set('surl','https://test-payment-middleware.payu.in/simulatorResponse'); 
-encodedParams.set('furl','https://test-payment-middleware.payu.in/simulatorResponse'); 
-encodedParams.set('pg','cc'); 
-encodedParams.set('bankcode','cc'); 
-encodedParams.set('ccnum','5123456789012346'); 
-encodedParams.set('ccexpmon','05'); 
-encodedParams.set('ccexpyr','2024'); 
-encodedParams.set('ccvv','123'); 
-encodedParams.set('ccname',''); 
-encodedParams.set('txn_s2s_flow','4'); 
-encodedParams.set('hash','89ac4e87106a1804a15fdc6efb1c32ca6d68592d65799dcc99b07b40e56684b1b31dec77cfd32c8d3436066fda7d547ea9b484ccb10670d96fd8f0cfeb97dbb0'); 
-
-
-
-
-
-var payumoney = require('payumoney_nodejs');
-  payumoney.setProdKeys("MERCHANT_KE", "MERCHANT_SALT", "PAYUMONEY_AUTHORIZATION_HEADER");
-  payumoney.setSandboxKeys("Pz9v2c", "TbxC2ph02lBUbVYwx0fIB50CvqL27pHo", "PAYUMONEY_AUTHORIZATION_HEADER");
-  payumoney.isProdMode(false); //set false for use of sandbox mode
-
-
 
 
 module.exports = {
@@ -62,12 +19,14 @@ module.exports = {
 
 
 
-    getEventsByDepartment : [tokenValidator, async (req, res) => {
+    getEventsByDepartment : [ tokenValidator,async (req, res) => {
 
         const db_connection = await db.promise().getConnection();
         try{
             let sql_q = "select * from AnokhaEventsAndDepartments order by departmentAbbr";
+            await db_connection.query('lock tables eventdata read, departmentdata read, AnokhaEventsAndDepartments read');
             const [results] = await db_connection.query(sql_q);
+            await db_connection.query('unlock tables');
             var jsonResponse = [];
            if(results.length != 0)
            {
@@ -93,9 +52,9 @@ module.exports = {
                         }
                     });
            }
+           res.status(200).send(jsonResponse);
 
-
-            res.status(200).send(jsonResponse);
+            
         }
 
         catch (err) {
@@ -111,6 +70,7 @@ module.exports = {
           }
 
         
+        
     }],
 
 
@@ -119,13 +79,16 @@ module.exports = {
 
 
     getUserDetails : [tokenValidator, async (req, res) => {
-        if(validator.isEmail(req.params.userEmail))
+        if(req.params.userEmail != undefined &&
+            validator.isEmail(req.params.userEmail))
          {
 
         const db_connection = await db.promise().getConnection();
         try{
+            await db_connection.query("lock tables userdata read, AnokhaUserData read");
             let sql_q = "select * from AnokhaUserData where userEmail = ?";
             const [results] = await db_connection.query(sql_q, req.params.userEmail);
+            await db_connection.query('unlock tables');
             res.status(200).send(results);
         }
 
@@ -167,14 +130,13 @@ module.exports = {
                 return;
             }
             else{
-        let sql_q = `Update userData SET fullName = ?,password = ? where userEmail = ?`
-        let db_connection = await db.promise().getConnection();
+                let sql_q = `Update userData SET fullName = ?,password = ? where userEmail = ?`
+                let db_connection = await db.promise().getConnection();
         try{
-            const lockName = "EDITUSERDETAILS";
-            const lockTimeout = 10;
-            await db_connection.query(`SELECT GET_LOCK(?, ?)`, [lockName, lockTimeout]);
+            
+            await db_connection.query('lock tables userdata write');
             const [results] = await db_connection.query(sql_q, [req.body.fullName,req.body.password,req.body.userEmail]); 
-            await db_connection.query(`SELECT RELEASE_LOCK(?)`, [lockName]);
+            await db_connection.query('unlock tables');
             if(results.affectedRows == 0)
             {
                 res.status(400).send({"error" : "no data found. dont play around here..."});
@@ -213,11 +175,12 @@ module.exports = {
         try{
             
             let sql_q = `select * from AnokhaCompleteUserData where userEmail = ? and password = ?`;
+            await db_connection.query("lock tables AnokhaCompleteUserData read, UserData read, CollegeData read")
             const [result] = await db_connection.query(sql_q, [req.body.userEmail, req.body.password]);
+            await db_connection.query('unlock tables');
             if(result.length == 0)
             {
                 res.status(404).send({error : "User not found"});
-                return;
             }
             else{
 
@@ -272,13 +235,13 @@ module.exports = {
 
     
 
-    registerUser :(req, res) =>{
+    registerUser : async (req, res) =>{
 
 
-        if(validator.isEmpty(req.body.userEmail)||
-            validator.isEmpty(req.body.fullName)||
-            validator.isEmpty(req.body.password)||
-            validator.isEmpty(req.body.collegeId) ||
+        if(req.body.userEmail == undefined ||
+            req.body.fullName == undefined ||
+            req.body.password == undefined ||
+            req.body.collegeId == undefined ||
             !validator.isEmail(req.body.userEmail))
             
             {
@@ -288,94 +251,87 @@ module.exports = {
 
             else{
                
-
-                db.query(`select * from AnokhaUserData where userEmail = ?`,[req.body.userEmail], (err, result) =>{
-                    if(err)
+                const db_connection = await db.promise().getConnection();
+                try{
+                    await db_connection.query("lock tables AnokhaUserData read");
+                    const [result] = await db_connection.query("select * from AnokhaUserData where userEmail = ?",[req.body.userEmail] );
+                    await db_connection.query("unlock tables");
+                    if(result.length != 0)
                     {
-                       
+                        res.status(409).send({"error" : "user already exists..."});
+                        
+                    }
+                    else{
+
+                        if(req.body.collegeId == 633 || req.body.collegeId == 638 || req.body.collegeId == 645)
+                        {
+                            if(req.body.userEmail.includes("@cb.amrita.edu") || req.body.userEmail.includes("@cb.students.amrita.edu"))
+                            {
+                                //User is from Amrita CBE with Amrita Email
+                                //Need tp verify credibility
+                            }
+                            else
+                            {
+                                //User claims to be from Amrita CBE
+                                //Email is not under Amrita domain
+                                //Credibility cannot be verified
+                                res.status(400).send({"error" : "invalid email"});
+                                return;
+                            }
+                        }
+                        else{
+                
+                            //User is not from Amrita CBE
+                            //Need tp verify credibility of email given
+                            
+                        }
+                        var isAmrita = 0;
+                        if(req.body.collegeId == 633 || req.body.collegeId == 638 || req.body.collegeId == 645)
+                        {
+                            isAmrita = 1;
+                        }
+                        const otpGenerated = randonNumberGenerator();
+                        const now = new Date();
+                        now.setUTCHours(now.getUTCHours() + 5);
+                        now.setUTCMinutes(now.getUTCMinutes() + 30);
+                        const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+
+                        await db_connection.query("lock tables otp write");
+                        await db_connection.query(`delete from OTP where userEmail = ?`,[req.body.userEmail], (err, res) => {});
+                        await db_connection.query(`insert into OTP (userEmail, otp, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,[req.body.userEmail,otpGenerated,req.body.fullName,req.body.password,req.body.currentStatus,0,isAmrita,req.body.collegeId,istTime,null,null]);
+                        await db_connection.query("unlock tables");
+                               
+                        const token = await otpTokenGenerator({
+                                    userEmail : req.body.userEmail,
+                                    password : req.body.password
+                        });
+                                
+                        mailer (req.body.fullName, req.body.userEmail, otpGenerated);
+                        res.status(200).send({SECRET_TOKEN : token});
+                        }
+                        
+
+
+
+                    }
+
+
+                
+                catch(err)
+                {
                         const now = new Date();
                         now.setUTCHours(now.getUTCHours() + 5);
                          now.setUTCMinutes(now.getUTCMinutes() + 30);
                          const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
                         fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
                         fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                        res.status(500).send({error : "Query Error... Contact DB Admin"});
-                    }
-                    else{
-                      
-                        if(result.length != 0)
-                        {
-                            res.status(409).send({"error" : "user already exists..."});
-                            
-                        }
-                        else{
+                        res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+                }
+                finally{
+                    db_connection.release();
+                }
 
-                            if(req.body.collegeId == 1)
-                            {
-                                if(req.body.userEmail.includes("@cb.amrita.edu") || req.body.userEmail.includes("@cb.students.amrita.edu"))
-                                {
-                                    //User is from Amrita CBE with Amrita Email
-                                    //Need tp verify credibility
-                                }
-                                else
-                                {
-                                    //User claims to be from Amrita CBE
-                                    //Email is not under Amrita domain
-                                    //Credibility cannot be verified
-                                    res.status(400).send({"error" : "invalid email"});
-                                    return;
-                                }
-                            }
-                            else{
-                    
-                                //User is not from Amrita CBE
-                                //Need tp verify credibility of email given
-                                
-                            }
-                            var isAmrita = 0;
-                            if(req.body.collegeId == 1)
-                            {
-                                isAmrita = 1;
-                            }
-                            const otpGenerated = randonNumberGenerator();
-                            const now = new Date();
-                            now.setUTCHours(now.getUTCHours() + 5);
-                            now.setUTCMinutes(now.getUTCMinutes() + 30);
-                            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-
-
-                            db.query(`delete from OTP where userEmail = ?`,[req.body.userEmail], (err, res) => {});
-                            db.query(`insert into OTP (userEmail, otp, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,[req.body.userEmail,otpGenerated,req.body.fullName,req.body.password,req.body.currentStatus,0,isAmrita,req.body.collegeId,istTime,null,null], async (err, result)=> {
-                                if(err)
-                                {
-                                    
-                                    
-                                    const now = new Date();
-                                    now.setUTCHours(now.getUTCHours() + 5);
-                                    now.setUTCMinutes(now.getUTCMinutes() + 30);
-                                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                                    res.status(500).send({error : "Query Error... Contact DB Admin"});
-                                }
-                                else{
-                                   
-                                    const token = await otpTokenGenerator({
-                                        userEmail : req.body.userEmail,
-                                        password : req.body.password
-                                    });
-                                    //sending OTP to user
-                                   mailer (req.body.fullName, req.body.userEmail, otpGenerated);
-                                    res.status(200).send({SECRET_TOKEN : token});
-                                }
-                            });
-
-
-
-                        }
-                    }
-                })
-
+               
        
         
     }
@@ -384,10 +340,11 @@ module.exports = {
     },
 
 
-    verifyOTP :[otpTokenValidator, (req, res) => {
+    verifyOTP :[otpTokenValidator, async (req, res) => {
 
 
-        if(validator.isEmpty(req.body.userEmail) ||
+        if(req.body.userEmail == undefined ||
+            req.body.otp == undefined ||
         !validator.isEmail(req.body.userEmail) ||
         !validator.isNumeric(req.body.otp))
         {
@@ -398,35 +355,43 @@ module.exports = {
         const otp = req.body.otp;
         const userEmail = req.body.userEmail;
 
-        db.query(`select * from  AnokhaOTP where userEmail = ? and otp = ?`,[userEmail,otp], (err, result) => {
-            if(err)
-            {
-                const now = new Date();
-                now.setUTCHours(now.getUTCHours() + 5);
-                now.setUTCMinutes(now.getUTCMinutes() + 30);
-                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-                res.status(500).send({error : "Query Error... Contact DB Admin"});
-            }
-            else{
-                
-                if(result.length == 1)
+        const db_connection = await db.promise().getConnection();
+        try{
+            await db_connection.query("lock tables otp write, anokhaotp write");
+            const [result] = await db_connection.query(`select * from  AnokhaOTP where userEmail = ? and otp = ?`,[userEmail,otp]);
+            await db_connection.query("unlock tables");
+            if(result.length == 1)
                 {
                     const now = new Date();
                     now.setUTCHours(now.getUTCHours() + 5);
                     now.setUTCMinutes(now.getUTCMinutes() + 30);
                     const istTime = now.toISOString().slice(0, 19).replace('T', ' ');   
-                    db.query(`insert into UserData (userEmail, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,[result[0].userEmail,result[0].fullName,result[0].password,result[0].currentStatus,0,result[0].isAmritaCBE,result[0].collegeId,istTime,null,null], (err2, result2) => {});
-                    db.query(`delete from OTP where userEmail = ?`,[userEmail], (err, result3) => {});
+                    await db_connection.query("lock tables UserData write, otp write");
+                    db_connection.query(`insert into UserData (userEmail, fullName, password, currentStatus, activePassport, isAmritaCBE, collegeId, accountTimeStamp, passportId, passportTimeStamp) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,[result[0].userEmail,result[0].fullName,result[0].password,result[0].currentStatus,0,result[0].isAmritaCBE,result[0].collegeId,istTime,null,null]);
+                    db_connection.query(`delete from OTP where userEmail = ?`,[userEmail]);
+                    await db_connection.query("unlock tables");
                     welcomeMailer(result[0].fullName, userEmail);
                     res.status(200).send({"result" : "success"})
                 }
                 else{
                     res.status(400).send({"error" : "Cannot verify please try again"})
                 }
-            }
-        })
+
+        }
+
+        catch(err)
+        {
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                 now.setUTCMinutes(now.getUTCMinutes() + 30);
+                 const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+        }
+        finally{
+            db_connection.release();
+        } 
     }
 
     }],
@@ -439,8 +404,7 @@ module.exports = {
 
             if(req.body.userEmail == undefined ||
                 req.body.eventId == undefined ||
-                !validator.isEmail(req.body.userEmail)
-            ||
+                !validator.isEmail(req.body.userEmail) ||
             !validator.isNumeric(req.body.eventId))
             {
                 res.status(400).send({error : "We are one step ahead! Try harder!"});
@@ -451,11 +415,9 @@ module.exports = {
             let sql_q = `insert into starredevents values (?,?)`
             let db_connection = await db.promise().getConnection();
             try{
-                const lockName = "INSERTSTARREDEVENTS";
-                const lockTimeout = 10;
-                await db_connection.query(`SELECT GET_LOCK(?, ?)`, [lockName, lockTimeout]);
+                await db_connection.query("lock tables starredevents write");
                 const [results] = await db_connection.query(sql_q, [req.body.eventId,req.body.userEmail]); 
-                await db_connection.query(`SELECT RELEASE_LOCK(?)`, [lockName]);
+                await db_connection.query("unlock tables");
                 if(results.affectedRows == 0)
                 {
                     res.status(400).send({"error" : "no data found. dont play around here..."});
@@ -497,16 +459,13 @@ module.exports = {
             }
             else{
 
-            let user_email = req.body.userEmail;
-            let event_id = req.body.eventId;
+            
             let sql_q = `delete from starredevents where (userEmail = ? and eventId = ?)`;
             let db_connection = await db.promise().getConnection();
             try{
-                const lockName = "INSERTSTARREDEVENTS";
-                const lockTimeout = 10;
-                await db_connection.query(`SELECT GET_LOCK(?, ?)`, [lockName, lockTimeout]);
+                await db_connection.query("lock tables starredevents write");
                 const [results] = await db_connection.query(sql_q, [req.body.userEmail, req.body.eventId]); 
-                await db_connection.query(`SELECT RELEASE_LOCK(?)`, [lockName]);
+                await db_connection.query("unlock tables");
                 if(results.affectedRows == 0)
                 {
                     res.status(400).send({"error" : "no data found. dont play around here..."});
@@ -548,7 +507,9 @@ module.exports = {
 
             let db_connection = await db.promise().getConnection();
             try{
+                await db_connection.query("lock tables starredevents read");
                 const [result] = await db_connection.query(`select * from AnokhaStarredEventsData where userEmail = ?`,[req.params.userEmail]);
+                await db_connection.query("unlock tables");
                 res.send(result);
             }
             catch{
@@ -572,7 +533,9 @@ module.exports = {
     getCrewDetails : [tokenValidator,
        async (req,res) => {
             let db_connection = await db.promise().getConnection();
+            await db_connection.query("lock tables AnokhaCrewCompleteData read, userdata read, collegedata read");
             let sql_q = `select * from AnokhaCrewCompleteData`;
+            await db_connection.query("unlock tables");
             try{
             const [result] = await db_connection.query(sql_q);
             res.status(200).send(result);
@@ -600,7 +563,9 @@ module.exports = {
     getAllEvents : [tokenValidator, async (req, res) => {
         let db_connection = await db.promise().getConnection();
         try{
+            await db_connection.query("lock tables AnokhaEventData read, eventdata read");
             const [result] = await db_connection.query(`select * from AnokhaEventData`);
+            await db_connection.query("unlock tables");
             res.status(200).send(result);
         }
         catch(err)
@@ -624,6 +589,8 @@ module.exports = {
 
 
 
+
+
     moveToTransaction : [async (req, res) => {
         const tokenHeader = req.headers.authorization;
         const token = tokenHeader && tokenHeader.split(' ')[1];
@@ -643,157 +610,115 @@ module.exports = {
         res.status(200).send({"TRANSACTION_SECRET_TOKEN" : transactionToken});
     }],
 
-    initiateTransaction : [transactionTokenVerifier, async (req, res) => {
-        if(
-            validator.isEmpty(req.body.transactionId) ||
-            !validator.isEmail(req.body.userEmail) ||
-            req.body.userEmail == undefined||
-            validator.isEmpty(req.body.transactionId) ||
-            req.body.transactionId == undefined ||
-            validator.isEmpty(req.body.sender) ||
-            req.body.sender == undefined ||
-            validator.isEmpty(req.body.senderAccNo) ||
-            req.body.senderAccNo == undefined ||
-            validator.isEmpty(req.body.receiver) ||
-            req.body.receiver == undefined ||
-            validator.isEmpty(req.body.receiverAccNo) ||
-            req.body.receiverAccNo == undefined ||
-            validator.isEmpty(req.body.eventIdOrPassportId) ||
-            req.body.eventIdOrPassportId == undefined ||
-            validator.isEmpty(req.body.amount) ||
-            req.body.amount == undefined
-        )
-        {
-            res.status(400).send({error : "We are one step ahead! Try harder!"});
-            return;
-        }
-        else{
 
-            const db_connection = await transactions_db.promise().getConnection();
-            try{
-                const lockName = "INITIATETRANSACTION";
-                const lockTimeout = 10;
-                await db_connection.query(`SELECT GET_LOCK(?, ?)`, [lockName, lockTimeout]);
-                const now = new Date();
-                now.setUTCHours(now.getUTCHours() + 5);
-                now.setUTCMinutes(now.getUTCMinutes() + 30);
-                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-                const [result] = await db_connection.query(`insert into transactions (transactionId, userEmail, sender, senderAccNo, receiver, receiverAccNo, eventIdOrPassportId, amount, timeStamp, transactionStatus) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [req.body.transactionId, req.body.userEmail, req.body.sender, req.body.senderAccNo, req.body.receiver, req.body.receiverAccNo, req.body.eventIdOrPassportId, req.body.amount, istTime, 0]);
-                await db_connection.query(`SELECT RELEASE_LOCK(?, ?)`, [lockName]);
-            }
-            catch(err)
-            {
-                const now = new Date();
-            now.setUTCHours(now.getUTCHours() + 5);
-            now.setUTCMinutes(now.getUTCMinutes() + 30);
-            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
-            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
-            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
-            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
-            }
 
-            finally{
-                await db_connection.release();
-            }
-    }
-    }],
+    
 
 
     
 
 
 
-    cardInitiate : async (req, res) => {
+    intiatePay :[transactionTokenVerifier, async (req, res) => {
 
-        if((req.body.productinfo == undefined ||
-            req.body.fullName == undefined ||
+        if(
+            req.body.productId == undefined ||
+            req.body.firstName == undefined ||
             req.body.userEmail == undefined ||
+            !validator.isEmail(req.body.userEmail) ||
             req.body.address == undefined ||
             req.body.city == undefined ||
             req.body.state == undefined ||
             req.body.country == undefined ||
             req.body.zipcode == undefined ||
             req.body.phoneNumber == undefined ||
-            req.body.ccnum == undefined ||
-            req.body.ccexpmon == undefined ||
-            req.body.ccexpyr == undefined ||
-            req.body.ccvv == undefined ||
-            req.body.ccname == undefined)
+            !validator.isNumeric(req.body.zipcode) ||
+            !validator.isNumeric(req.body.phoneNumber)
 
             )
             {
                 res.status(400).send({"error" : "Wohooooo..! Be careful.... If you are bad, I am your dad!"})
             }
             else{
-                
-                // Generate a unique transaction ID
-                const txid = "ORD" + new Date().getTime();
 
-                // Set up the payment parameters
-                const amount = parseFloat("3.14");
-                const key = "Pz9v2c";
-                const salt = "TbxC2ph02lBUbVYwx0fIB50CvqL27pHo";
-                const productinfo = req.body.productinfo;
-                const firstName = req.body.fullName;
-                const userEmail = req.body.userEmail;
-                const phoneNumber = req.body.phoneNumber;
-                const callbackurl = "https://anokha.amrita.edu/api";
-                // Create the SHA512 hash of the payment parameters
-                const text = key + "|" + txid + "|" + amount + "|" + productinfo + "|" + firstName + "|" + userEmail + "|"+ callbackurl +"||||||||||" + salt;
-                const hash = crypto.createHash('sha512');
-                hash.update(text);
-                const hashedData = hash.digest('hex');
- 
-                // Set up the payment data to be sent in the POST request
-                const postData = querystring.stringify({
-                'key' : key,
-                'txnid' : txid,
-                'amount' : amount,
-                'firstname' : firstName,
-                'email' : userEmail,
-                'phone' : phoneNumber,
-                'productinfo' : productinfo,
-                'pg' : 'cc',
-                'bankcode' : 'cc',
-                'surl' : 'https://www.google.com',
-                'furl' : 'https://www.google.com',
-                "ccnum" : req.body.ccnum,
-                "ccexpmon" : req.body.ccexpmon,
-                "ccexpyr" : req.body.ccexpyr,
-                "ccvv" : req.body.ccvv,
-                "ccname" : req.body.ccname,
-                'txn_s2s_flow' : 4,
-                "udf1" : callbackurl,
-                'hash' : hashedData
-            });
-            try{
-                const payUUrl = 'https://test.payu.in/_payment';
-                const response = await axios.post(payUUrl, postData);
-                res.status(200).send({"data" : response.data});
+                var hashedData;
+                var txid;
+                const db_connection = await db.promise().getConnection();
+                try{
+                    await db_connection.query("lock tables eventData read");
+                    const [result] = await db_connection.query("select * from eventData where eventId = ?", [req.body.productId]);
+                    await db_connection.query("unlock tables");
+                    if(request.length == 0)
+                    {
+                        res.send(400).send({"error" : "We are much ahead of you..."});
+                        return;
+                    }
+                    else{
+                        txid = "ANOKHA2023" + new Date().getTime();
+                        const amount = result.fees;
+                        const key = "Pz9v2c";
+                        const salt = "TbxC2ph02lBUbVYwx0fIB50CvqL27pHo";
+                        const productinfo = req.body.productId;
+                        const firstName = req.body.firstName;
+                        const userEmail = req.body.userEmail;
+                        const phoneNumber = req.body.phoneNumber;
+                        const callbackurl = "http://52.66.236.118:3000/userApp/data";
+                        const text = key + "|" + txid + "|" + amount + "|" + productinfo + "|" + firstName + "|" + userEmail + "|||||||||||" + salt;
+                        const hash = crypto.createHash('sha512');
+                        hash.update(text);
+                        hashedData = hash.digest('hex');
+                        
+                    }
+                    
+                }
+                catch(err)
+                    {
+                            const now = new Date();
+                            now.setUTCHours(now.getUTCHours() + 5);
+                            now.setUTCMinutes(now.getUTCMinutes() + 30);
+                            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+                    }
+                finally{
+                    await db_connection.release();
+                }
 
-                } catch (error) {
-                res.status(500).send({error: error.message});
-}
+                const transaction_db_connection = await transactions_db.promise().getConnection(); 
+                try{
+                      
+                    
+                    await transaction_db_connection.query("lock tables transactions write");
+                    await transaction_db_connection.query("insert into transactions values ", [req.body.eventId]);
+                    await transaction_db_connection.query("unlock tables");
 
+
+                }
+                catch(err)
+                {
+                    const now = new Date();
+                    now.setUTCHours(now.getUTCHours() + 5);
+                    now.setUTCMinutes(now.getUTCMinutes() + 30);
+                    const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                    fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                    fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                    res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+                }
+                finally{
+                    await transaction_db_connection.release();
+                }
+
+                res.status(201).send({
+                    "txid" : txid,
+                    "hash" : hashedData
+                })
+           
             }
 
+    }],
 
-
-
-
-
-
-  
-  
-
-
-
-    },
-
-    trial : async(req, res) =>
-    {
-        res.send("OK");
-    }
+   
    
 
 }

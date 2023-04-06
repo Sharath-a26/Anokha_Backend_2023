@@ -9,7 +9,7 @@ async function createToken(data) {
         const payload = await verify(data.SECRET_TOKEN, publicKey);
         data["userEmail"] = payload["userEmail"];
         const transactionPrivateKey = fs.readFileSync('./AssymetricKeyPair/transaction_private_key.pem');
-        const transactionToken = await sign(data, transactionPrivateKey, { expiresIn: "10 m" });
+        const transactionToken = await sign(data, transactionPrivateKey, { expiresIn: "15 m" });
         return transactionToken;
        
     }

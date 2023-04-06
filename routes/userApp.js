@@ -14,15 +14,11 @@ router.get('/getStarredEvents/:userEmail',userController.getStarredEvents);
 router.get('/getCrew',userController.getCrewDetails);
 router.get('/events/all', userController.getAllEvents);
 router.post('/transaction/moveToTransaction', userController.moveToTransaction);
-router.post('/transaction/initiateTransaction', userController.initiateTransaction);
-
-router.post('/card/initiateTransaction', userController.cardInitiate);
 
 
+router.post('transaction/initiateTransaction', userController.intiatePay);
 
-//router.post('/upi/initiateTransaction', userController.upiInitiate);
 
-router.post('/data', userController.trial)
 
 
 

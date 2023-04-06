@@ -250,3 +250,24 @@ TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
 2023-04-04 13:53:02
 TypeError: object is not iterable (cannot read property Symbol(Symbol.iterator))
 
+2023-04-06 17:31:51
+Error: Table 'anokha.transactions' doesn't exist
+
+Error: Table 'anokha.transactions' doesn't exist
+
+2023-04-06 17:32:08
+ReferenceError: hashedData is not defined
+
+2023-04-06 18:20:21
+2023-04-06 18:58:35
+Error: You have tried to call .then(), .catch(), or invoked await on the result of query that is not a promise, which is a programming error. Try calling con.promise().query(), or require('mysql2/promise') instead of 'mysql2' for a promise-compatible version of the query interface. To learn how to use async/await or Promises check out documentation at https://www.npmjs.com/package/mysql2#using-promise-wrapper, or the mysql2 documentation at https://github.com/sidorares/node-mysql2/tree/master/documentation/Promise-Wrapper.md
+
+2023-04-06 18:58:58
+Error: You have tried to call .then(), .catch(), or invoked await on the result of query that is not a promise, which is a programming error. Try calling con.promise().query(), or require('mysql2/promise') instead of 'mysql2' for a promise-compatible version of the query interface. To learn how to use async/await or Promises check out documentation at https://www.npmjs.com/package/mysql2#using-promise-wrapper, or the mysql2 documentation at https://github.com/sidorares/node-mysql2/tree/master/documentation/Promise-Wrapper.md
+
+2023-04-06 18:59:37
+Error: You have tried to call .then(), .catch(), or invoked await on the result of query that is not a promise, which is a programming error. Try calling con.promise().query(), or require('mysql2/promise') instead of 'mysql2' for a promise-compatible version of the query interface. To learn how to use async/await or Promises check out documentation at https://www.npmjs.com/package/mysql2#using-promise-wrapper, or the mysql2 documentation at https://github.com/sidorares/node-mysql2/tree/master/documentation/Promise-Wrapper.md
+
+Error: Table 'AnokhaEventsAndDepartments' was not locked with LOCK TABLES
+
+2023-04-06 19:01:47
