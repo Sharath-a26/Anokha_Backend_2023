@@ -17,6 +17,7 @@ const {generateKey, generateTransactionKey} = require('./AssymetricKeyPair/key')
 const createViews = require('./ViewGenerator/views.js');
 const establishConnection = require('./initializeConnection.js');
 const insertCollegeData = require('./SampleData/collegeData');
+const checkPaymentStatus = require('./TransactionVerifier/verifyTransactions.js');
 
 
 const numberOfSlaves = 10;
@@ -81,9 +82,7 @@ const PORT = 4000;
           cluster.fork();
         }
       
-        cluster.on('exit', (worker, code, signal) => {
-          console.log(`Worker ${worker.process.pid} died`);
-        });
+        setInterval(checkPaymentStatus, 900000);
     }
 
     else{
