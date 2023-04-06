@@ -29,6 +29,9 @@ router.post('/verifyOTP', userWebController.verifyOTP);
 // reset password
 router.post('/resetPass',userWebController.resetPass);
 
+//update user details
+router.post('/editUser',userWebController.editUserDetails)
+
 module.exports = router;
 
 

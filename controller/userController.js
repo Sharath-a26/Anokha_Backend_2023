@@ -11,9 +11,6 @@ const fs = require('fs');
 const request = require('request');
 const transactionTokenGenerator = require('../middleware/transactionTokenGenerator');
 const transactionTokenVerifier = require('../middleware/transactionTokenVerifier');
-var crypto = require("crypto");
-
-
 module.exports = {
 
 

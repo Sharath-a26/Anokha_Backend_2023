@@ -2,10 +2,10 @@ const mailer = require('nodemailer');
 const fs = require('fs');
 const welcomeMailer = (fullName, userEmail) => {
   var transporter = mailer.createTransport({
-    service: 'gmail',
+    service: 'hotmail',
     auth: {
-        user: 'kvaisakhkrishnan@gmail.com',
-        pass: 'bzadotrblgcgcnac'
+        user: 'anokha@cb.amrita.edu',
+        pass: '@u97*j3P^RG49V'
     }
 });
 
@@ -15,7 +15,10 @@ const welcomeMailer = (fullName, userEmail) => {
     
 
     var mailOptions = {
-        from: 'Anokha 2023',
+        from: {
+          name : "Anokha 2023",
+          address : 'anokha@cb.amrita.edu'
+        },
         to: userEmail,
         subject: 'Welcome to Anokha 2023: Unleash Your Genius at Amrita Vishwa Vidyapeetham, Coimbatore!',
         html: finaldata

@@ -6,6 +6,7 @@ const rn = require('random-number');
 const validator = require('validator');
 const mailer = require('../Mailer/adminAppUser.js');
 const { log } = require('console');
+const { param } = require('../routes/userApp');
  module.exports = {
 
 
@@ -585,6 +586,46 @@ getEventsByDate : [
         }
 
 
+    }
+],
+
+getTotalFee : [
+    tokenValidator,
+    async (req,res) => {
+        if(req.body.eventName == undefined && req.body.dept == undefined) {
+            res.send("No data passed in body to post")
+        }
+        else {
+        let db_connection = await db.promise().getConnection();
+        try {
+            await db_connection.query("lock tables eventData read");
+
+            let command = "";
+            if(req.body.dept == undefined) {
+                command = `select sum(fees) as EVENT_SUM from eventdata group by eventName having eventName = ?`;
+            }
+
+            else if(req.body.eventName == undefined) {
+                command = `select sum(fees) as DEPT_SUM from eventdata group by departmentAbbr having departmentAbbr = ?`;
+            }
+
+            let parameter = (req.body.eventName == undefined)? [req.body.dept] : [req.body.eventName];
+            const [result] = await db_connection.query(command,parameter)
+            await db_connection.query("unlock tables");
+            res.status(200).send(result);
+
+        }
+        catch(err) {
+            console.log(err);
+            const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+        }
+    }
     }
 ]
 

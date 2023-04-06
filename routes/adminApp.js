@@ -26,4 +26,8 @@ router.get('/getEventsByDate/:date',adminController.getEventsByDate)
 //for the security 
 router.get('/verifyUser/:userEmail',adminController.verifyUser);
 
+
+//Stats for the admin
+router.post('/getStats/totalFee',adminController.getTotalFee);
+
 module.exports = router;

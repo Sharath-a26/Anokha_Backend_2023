@@ -65,7 +65,6 @@ const insertDummyData = (db, transactions_db) => {
 }
 // db.query(`insert into StudentCoordinator (faculty, student, eventId) values ('FACCOORD_738865', 'STUDENTCOORD_738865', 2)`)
 
-    
 }
 
 
