@@ -703,17 +703,22 @@ module.exports = {
 
 
 
-    getTransactionData : async (req, res) => {
-        if(false && (req.body.productinfo == undefined ||
+    cardInitiate : async (req, res) => {
+
+        if((req.body.productinfo == undefined ||
             req.body.fullName == undefined ||
             req.body.userEmail == undefined ||
-            req.body.phoneNumber == undefined ||
             req.body.address == undefined ||
             req.body.city == undefined ||
             req.body.state == undefined ||
             req.body.country == undefined ||
             req.body.zipcode == undefined ||
-            req.body.firstName == undefined)
+            req.body.phoneNumber == undefined ||
+            req.body.ccnum == undefined ||
+            req.body.ccexpmon == undefined ||
+            req.body.ccexpyr == undefined ||
+            req.body.ccvv == undefined ||
+            req.body.ccname == undefined)
 
             )
             {
@@ -722,47 +727,52 @@ module.exports = {
             else{
                 
                 // Generate a unique transaction ID
-const txid = "ORD" + new Date().getTime();
+                const txid = "ORD" + new Date().getTime();
 
-// Set up the payment parameters
-const amount = parseFloat("3.14");
-const key = "gtKFFx";
-const salt = "4R38IvwiV57FwVpsgOvTXBdLE4tHUXFW";
-const productinfo = req.body.productinfo;
-const firstName = req.body.firstName;
-const userEmail = req.body.userEmail;
+                // Set up the payment parameters
+                const amount = parseFloat("3.14");
+                const key = "Pz9v2c";
+                const salt = "TbxC2ph02lBUbVYwx0fIB50CvqL27pHo";
+                const productinfo = req.body.productinfo;
+                const firstName = req.body.fullName;
+                const userEmail = req.body.userEmail;
+                const phoneNumber = req.body.phoneNumber;
+                const callbackurl = "https://anokha.amrita.edu/api";
+                // Create the SHA512 hash of the payment parameters
+                const text = key + "|" + txid + "|" + amount + "|" + productinfo + "|" + firstName + "|" + userEmail + "|"+ callbackurl +"||||||||||" + salt;
+                const hash = crypto.createHash('sha512');
+                hash.update(text);
+                const hashedData = hash.digest('hex');
+ 
+                // Set up the payment data to be sent in the POST request
+                const postData = querystring.stringify({
+                'key' : key,
+                'txnid' : txid,
+                'amount' : amount,
+                'firstname' : firstName,
+                'email' : userEmail,
+                'phone' : phoneNumber,
+                'productinfo' : productinfo,
+                'pg' : 'cc',
+                'bankcode' : 'cc',
+                'surl' : 'https://www.google.com',
+                'furl' : 'https://www.google.com',
+                "ccnum" : req.body.ccnum,
+                "ccexpmon" : req.body.ccexpmon,
+                "ccexpyr" : req.body.ccexpyr,
+                "ccvv" : req.body.ccvv,
+                "ccname" : req.body.ccname,
+                'txn_s2s_flow' : 4,
+                "udf1" : callbackurl,
+                'hash' : hashedData
+            });
+            try{
+                const payUUrl = 'https://test.payu.in/_payment';
+                const response = await axios.post(payUUrl, postData);
+                res.status(200).send({"data" : response.data});
 
-// Create the SHA512 hash of the payment parameters
-const text = key + "|" + txid + "|" + amount + "|" + productinfo + "|" + firstName + "|" + userEmail + "|||||||||||" + salt;
-const hash = crypto.createHash('sha512');
-hash.update(text);
-const hashedData = hash.digest('hex');
-console.log(text);
-console.log(hashedData);
-// Set up the payment data to be sent in the POST request
-const postData = querystring.stringify({
- 'key' : key,
- 'txnid' : txid,
- 'amount' : amount,
- 'firstname' : firstName,
- 'email' : userEmail,
- 'phone' : 9123412345,
- 'productinfo' : productinfo,
- 'pg' : 'UPI',
- 'bankcode' : 'UPI',
- "vpa" : "kvaisakhkrishnan@oksbi",
- 'surl' : 'https://anoka.amrita.edu/api',
- 'furl' : 'https://anoka.amrita.edu/api',
-'txn_s2s_flow' : 4,
-'hash' : hashedData
-});
-try{
-const payUUrl = 'https://test.payu.in/_payment';
-const response = await axios.post(payUUrl, postData);
-res.status(200).send(response.data);
-
-} catch (error) {
-res.status(500).send({error: error.message});
+                } catch (error) {
+                res.status(500).send({error: error.message});
 }
 
             }
@@ -782,7 +792,7 @@ res.status(500).send({error: error.message});
 
     trial : async(req, res) =>
     {
-        console.log("OK");
+        res.send("OK");
     }
    
 

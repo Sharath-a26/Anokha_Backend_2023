@@ -16,12 +16,13 @@ router.get('/events/all', userController.getAllEvents);
 router.post('/transaction/moveToTransaction', userController.moveToTransaction);
 router.post('/transaction/initiateTransaction', userController.initiateTransaction);
 
+router.post('/card/initiateTransaction', userController.cardInitiate);
 
 
 
-router.post('/getTransactionData', userController.getTransactionData);
+//router.post('/upi/initiateTransaction', userController.upiInitiate);
 
-router.get('/data', userController.trial)
+router.post('/data', userController.trial)
 
 
 
