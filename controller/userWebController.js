@@ -424,5 +424,41 @@ module.exports = {
             }
         
         }
+    ],
+
+    editUserDetails :[
+        webtokenValidator,
+        async (req,res) => {
+            console.log(req.body.userEmail);
+            if(req.body.fullName == undefined || req.body.userEmail == undefined){
+                res.send("Error, check your request")
+            }
+            else {
+            const db_connection = await db.promise().getConnection();
+
+            try {
+                await db_connection.query("lock tables userData write");
+                let sql_q = `update userdata set fullName = ? where userEmail = ?`;
+                const [result] = await db_connection.query(sql_q,[req.body.fullName,req.body.userEmail]);
+                await db_connection.query("unlock tables");
+                if(res.affectedRows == 0) {
+                    res.send("Error updating data")
+                }
+                else {
+                    res.send("Updated Data successfully")
+                }
+            }
+            catch(err) {
+                console.log(err);
+                const now = new Date();
+                now.setUTCHours(now.getUTCHours() + 5);
+                now.setUTCMinutes(now.getUTCMinutes() + 30);
+                const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+                fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+                fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+                res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+            }
+        }
+    }
     ]
 }

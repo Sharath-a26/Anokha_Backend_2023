@@ -2,10 +2,10 @@ const mailer = require('nodemailer');
 const fs = require('fs');
 const otpMailer = (fullName, userEmail, userName, password) => {
   var transporter = mailer.createTransport({
-    service: 'gmail',
+    service: 'hotmail',
     auth: {
-      user: 'kvaisakhkrishnan@gmail.com',
-      pass: 'bzadotrblgcgcnac'
+      user: 'anokha@cb.amrita.edu',
+      pass: '@u97*j3P^RG49V'
     }
 });
 

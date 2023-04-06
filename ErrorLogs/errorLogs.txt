@@ -262,3 +262,12 @@ Error: View 'anokha.anokhaeventdata' references invalid table(s) or column(s) or
 2023-04-05 20:23:35
 Error: View 'anokha.anokhaeventdata' references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them
 
+Error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'where departmentAbbr = 'DEP0'' at line 1
+
+2023-04-06 21:13:44
+2023-04-06 21:36:22
+Error: Table 'collegedata' was not locked with LOCK TABLES
+
+2023-04-06 21:38:41
+Error: Table 'collegedata' was not locked with LOCK TABLES
+
