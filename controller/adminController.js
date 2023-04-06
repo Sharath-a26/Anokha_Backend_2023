@@ -627,6 +627,48 @@ getTotalFee : [
         }
     }
     }
+],
+
+getTotalRegs : [
+    tokenValidator,
+    async (req,res) => {
+
+        if(req.body.eventName == undefined && req.body.dept == undefined) {
+            res.send("No data sent in post")
+        }
+        else {
+        let db_connection = await db.promise().getConnection();
+        try {
+            await db_connection.query("lock tables eventData read");
+            let command = "";
+            if(req.body.dept == undefined) {
+                command = `select noOfRegistrations from eventdata where eventdata = ?`;
+            }
+            else if(req.body.evetName == undefined) {
+                command = `select sum(noOfRegistrations) as DEPT_REGISTRATIONS from eventdata group by departmentAbbr having departmentAbbr = ?`
+            }
+            let parameter = (req.body.dept == undefined) ? [req.body.eventName] : [req.body.dept];
+
+            const [result] = db_connection.query(command,parameter);
+            await db_connection.query("unlock tables")
+
+            res.status(200).send(result);
+            
+
+        }
+
+        catch(err) {
+            console.log(err);
+            const now = new Date();
+            now.setUTCHours(now.getUTCHours() + 5);
+            now.setUTCMinutes(now.getUTCMinutes() + 30);
+            const istTime = now.toISOString().slice(0, 19).replace('T', ' ');
+            fs.appendFile('ErrorLogs/errorLogs.txt', istTime+"\n", (err)=>{});
+            fs.appendFile('ErrorLogs/errorLogs.txt', err.toString()+"\n\n", (err)=>{});
+            res.status(500).send({"Error" : "Contact DB Admin if you see this message"});
+        }
+        }
+    }
 ]
 
     

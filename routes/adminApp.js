@@ -30,4 +30,7 @@ router.get('/verifyUser/:userEmail',adminController.verifyUser);
 //Stats for the admin
 router.post('/getStats/totalFee',adminController.getTotalFee);
 
+//Stats for total regs
+router.post('/getStats/totalRegs',adminController.getTotalRegs);
+
 module.exports = router;
