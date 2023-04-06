@@ -649,7 +649,7 @@ getTotalRegs : [
             }
             let parameter = (req.body.dept == undefined) ? [req.body.eventName] : [req.body.dept];
 
-            const [result] = db_connection.query(command,parameter);
+            const [result] = await db_connection.query(command,parameter);
             await db_connection.query("unlock tables")
 
             res.status(200).send(result);
