@@ -642,7 +642,7 @@ getTotalRegs : [
             await db_connection.query("lock tables eventData read");
             let command = "";
             if(req.body.dept == undefined) {
-                command = `select noOfRegistrations from eventdata where eventdata = ?`;
+                command = `select noOfRegistrations from eventdata where eventName = ?`;
             }
             else if(req.body.evetName == undefined) {
                 command = `select sum(noOfRegistrations) as DEPT_REGISTRATIONS from eventdata group by departmentAbbr having departmentAbbr = ?`
