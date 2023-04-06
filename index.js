@@ -22,7 +22,7 @@ const checkPaymentStatus = require('./TransactionVerifier/verifyTransactions.js'
 
 const numberOfSlaves = 10;
 
-const PORT = 4000;
+const PORT = 3000;
 
 
     server.use(helmet())
