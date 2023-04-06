@@ -12,6 +12,15 @@ router.post("/login", adminController.adminLogin);
 router.get('/getRegisteredUsers/:eventId',adminController.registeredUsers);
 router.post('/events/updateEvent', adminController.updateEventData);
 
+//get all events for search
+router.get('/getAllEvents',adminController.getAllEvents);
+
+//get all events by department
+router.get('/getEventsByDept/:dept',adminController.getEventsByDept)
+
+//get events by date
+router.get('/getEventsByDate/:date',adminController.getEventsByDate)
+
 //router.post('/addStudentCoordinator')
 
 //for the security 

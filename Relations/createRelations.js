@@ -117,7 +117,7 @@ const createTables = (db) => {
         }
     })
 
-    db.query("create table VisitsData (userEmail varchar(65), entryTimeStamp timestamp, exitTimeStamp timestamp, inside boolean, foreign key (userEmail) references UserData(userEmail))", (err, res)=>{
+    db.query("create table VisitsData (visit_id int PRIMARY KEY AUTO_INCREMENT,userEmail varchar(65), entryTimeStamp timestamp, exitTimeStamp timestamp, inside boolean, foreign key (userEmail) references UserData(userEmail))", (err, res)=>{
         if(err)
         {
             console.log("Failed to create VisitsData table");

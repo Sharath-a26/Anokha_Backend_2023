@@ -11,8 +11,8 @@ const server = express()
 const cors = require('cors');
 const userAppRouter = require('./routes/userApp');
 const adminAppRouter = require('./routes/adminApp');
-const userWebRouter = require('./routes/userWeb.js');
-const adminWebRouter = require('./routes/adminWeb.js');
+const userWebRouter = require('./routes/userWeb');
+const adminWebRouter = require('./routes/adminWeb');
 const {generateKey, generateTransactionKey} = require('./AssymetricKeyPair/key');
 const createViews = require('./ViewGenerator/views.js');
 const establishConnection = require('./initializeConnection.js');
@@ -73,8 +73,7 @@ const PORT = 4000;
         
         
             //Please be careful. Dont run this command if you have data in backend.
-            //initializeStep1();
-            //initializeStep2();
+            //initialize();
       
         // Fork workers
         for (let i = 0; i < numberOfSlaves; i++) {
